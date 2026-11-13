@@ -524,3 +524,14 @@ body.at-top .nav{top:52px}
   #cx.cx-free .cx>div:last-child{order:6}
   #cx.cx-free .cx-c{order:7}#cx.cx-free .cx-stats{order:8}#cx.cx-free .cx-note{order:9;display:block!important}
 }
+
+/* quote form: products */
+.f fieldset.prods{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px 18px}
+.f fieldset.prods legend{font-size:.85rem;font-weight:600;margin-bottom:8px;padding:0}
+.f fieldset.prods label{display:inline-flex;align-items:center;gap:8px;font-weight:500}
+.f fieldset.prods input{width:auto}
+/* builder actions + warning */
+.cx-acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.cx-acts .pill.ghost{color:inherit}
+.cx-note .warn{display:inline-block;background:var(--copper);color:#fff;border-radius:10px;padding:2px 8px;margin-right:4px;font-weight:600}
+@media (max-width:900px) and (min-height:560px){ #cx .cx-acts{order:9;margin-top:8px} #cx:not(.cx-free) .cx-acts{display:none} }

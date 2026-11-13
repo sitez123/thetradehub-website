@@ -173,8 +173,24 @@ window.TH = {
     ["China", "GB/T 4100", "Ceramic tiles, a modified adoption of ISO 13006."],
     ["Japan", "JIS A 5209", "Japanese Industrial Standard for ceramic tiles."]
   ],
+  // other product lines
+  standardsOther: [
+    ["Insulation · Europe", "EN 13162", "Factory-made mineral wool for buildings. Isover Spacesaver is CE and UKCA marked to it, designation MW-EN 13162-T1."],
+    ["Insulation · fire", "EN 13501-1", "Reaction to fire classification. Spacesaver is Euroclass A1, non-combustible."],
+    ["Toilets · Europe", "EN 997", "WC pans and WC suites with integral trap. We confirm with the maker which test reports are available for each Starvoll model."]
+  ],
 
   glossary: [
+    ["One-piece WC", "A toilet with the cistern and bowl made as a single piece of ceramic, such as the Starvoll L175."],
+    ["Close-coupled WC", "A toilet whose cistern sits directly on the back of the bowl as a separate piece."],
+    ["S-trap / P-trap", "Where the WC's waste leaves: S-trap goes down through the floor, P-trap goes back into the wall."],
+    ["Roughing-in", "The distance from the finished wall to the centre of the waste pipe. The WC must match it."],
+    ["Glass mineral wool", "Insulation made from spun glass fibres, much of it recycled glass, supplied as rolls or slabs."],
+    ["λ (lambda)", "Thermal conductivity in W/m·K. The lower it is, the better the insulation."],
+    ["R-value", "Thermal resistance in m²K/W: thickness divided by λ. Higher is better."],
+    ["Euroclass A1", "The top reaction-to-fire class under EN 13501-1: non-combustible."],
+    ["EN 13162", "European standard for factory-made mineral wool insulation, behind its CE marking."],
+    ["VGM", "Verified gross mass: the weight of a packed container, declared before it is loaded on a ship."],
     ["Rectified", "Edges ground perfectly square after firing, so tiles can be laid with narrow 2 mm joints."],
     ["Polished", "A mirror-shine surface made by grinding and polishing the fired tile."],
     ["Lappato / full lappato", "A semi-polished surface: a soft sheen between matt and polished. Full lappato covers the whole face."],
@@ -200,13 +216,14 @@ window.TH = {
   faq: [
     ["Are you RAK Ceramics?", "No. The Trade Hub is an independent trading company in Ras Al Khaimah. We buy RAK Ceramics tiles and sell them on to trade buyers worldwide and in the UAE."],
     ["Where do you ship containers?", "Worldwide: to any port a shipping line serves from the UAE. Every quote names the port, routing and surcharges on the day."],
-    ["What is the minimum container order?", "One 20ft container (about 1,080 m² of 60 × 120 cm tile, around 23 tonnes). You can mix ranges and colours in it."],
-    ["Should I choose a 20ft or a 40ft?", "For tiles alone, usually a 20ft. Tiles hit the weight limit first, and a 40ft only carries about 8% more tile once road limits are respected (sometimes less). A 40ft suits mixed loads with lighter goods."],
-    ["Can I add sanitaryware to a container?", "Yes. Tiles are heavy and boxed WCs, basins and baths are light, so a mixed load uses the space that tiles leave empty. It works best in a 40ft. We plan the mix by weight and volume."],
-    ["Can I buy smaller amounts?", "Yes, by the pallet from our Jebel Ali warehouse: delivered across the UAE, or shipped worldwide when a job can't wait for a full container, for example urgent top-ups or replacement WCs and basins."],
+    ["What is the minimum container order?", "One 20ft container. Tiles alone fill it at about 1,080 m² of 60 × 120 cm (around 23 tonnes); you can mix ranges and colours, and add toilets and insulation rolls. Smaller orders go by the pallet."],
+    ["Should I choose a 20ft or a 40ft?", "For tiles alone, usually a 20ft: tiles hit the weight limit first, and a 40ft only carries about 8% more tile once road limits are respected. For toilets, insulation or a mixed load, a 40ft gives you twice the space. Try it in the load builder on the Containers page."],
+    ["Can I mix tiles, toilets and insulation in one container?", "Yes. Tile is heavy and fills a container by weight; boxed WCs and glass wool rolls are light and fill it by space. Mixed, they use both. Build your mix on the Containers page and we'll confirm the load plan with the quote."],
+    ["Which toilets and insulation do you supply?", "Starvoll WCs (led by the one-piece L175, in white, ivory, matt black and gold), as stocked in the UAE, and Isover Spacesaver glass mineral wool rolls, 100 to 200 mm, CE and UKCA marked to EN 13162."],
+    ["Can I buy smaller amounts?", "Yes, by the pallet from our Jebel Ali warehouse: tiles, toilets, insulation or a mix, delivered across the UAE or shipped worldwide when a job can't wait for a full container."],
     ["Which standards do the tiles meet?", "RAK makes porcelain to the international standard ISO 13006 and the European standard EN 14411 (CE marking, used across Europe). Other markets use their own standard (for example ANSI A137.1 in the USA, IS 15622 in India, GSO ISO 13006 in the Gulf). We confirm the test reports available for each range and your country. See our standards page."],
     ["Can I get samples?", "Yes. Ask for the ranges you're considering and we'll arrange samples before you commit to a container or pallet."],
     ["How are prices quoted?", "Per order, in writing: by the container or by the pallet, in AED, USD or EUR, ex-works, to your port, or delivered."],
-    ["Which documents do I get?", "Commercial invoice, packing list, bill of lading, certificate of origin and the Declaration of Performance for each range."]
+    ["Which documents do I get?", "Commercial invoice, packing list, bill of lading and certificate of origin, plus the standards papers for each product: the Declaration of Performance for tiles and insulation, and the maker's test data for toilets on request."]
   ]
 };
