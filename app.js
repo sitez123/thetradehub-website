@@ -52,9 +52,9 @@ function footer(){
       <p style="margin-top:14px" class="mono">${esc(C.phone)} · ${esc(C.email)}</p></div>
     <div><h4>Tiles</h4>${D.collections.map(c=>`<a href="#${c.id}">${c.name}</a>`).join('')}</div>
     <div><h4>Buying</h4><a href="#containers">Containers</a><a href="#pallets">Pallets</a><a href="#how-it-works">How it works</a><a href="#calculator">Calculator</a><a href="#quote">Get a quote</a><a href="#textiles">Textiles</a></div>
-    <div><h4>Know-how</h4><a href="#guides">Guides</a><a href="#standards">Standards</a><a href="#glossary">Glossary</a><a href="#faq">FAQ</a><a href="#about">About</a><a href="#credits">Credits</a></div>
+    <div><h4>Know-how</h4><a href="#guides">Guides</a><a href="#standards">Standards</a><a href="#glossary">Glossary</a><a href="#faq">FAQ</a><a href="#about">About</a></div>
   </div>
-  <p class="fine">The Trade Hub is an independent trading company in ${esc(C.base)}. RAK Ceramics and its range names are trademarks of RAK Ceramics PJSC; product photography courtesy of RAK Ceramics, used with permission.</p>
+  <p class="fine">The Trade Hub is an independent trading company in ${esc(C.base)}. RAK Ceramics and its range names are trademarks of RAK Ceramics PJSC.</p>
   <div class="wordmark" aria-hidden="true">The Trade Hub</div></div></footer>`;
 }
 
@@ -200,8 +200,8 @@ function famSwitch(page){
 /* ---------- pages ---------- */
 const P = {};
 const HV = (()=>{ try{ const q=new URLSearchParams(location.search).get('hero'); return ['a','b','c'].includes(q)?q:'b'; }catch(e){ return 'b'; } })();
-const CREDS = `<ul class="creds"><li>Factory-direct from RAK Ceramics</li><li>ISO 13006 · EN 14411</li><li>20ft · 40ft · pallets · air samples</li></ul>`;
-const SEAL = `<svg class="seal" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="sealp" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1-88 0"/></defs><circle cx="60" cy="60" r="58" fill="var(--noir)"/><text><textPath href="#sealp" textLength="272" lengthAdjust="spacing">RAK CERAMICS · FACTORY DIRECT · WORLDWIDE ·</textPath></text><g transform="translate(60 60) rotate(12)"><rect x="-13" y="-13" width="13" height="13" fill="#D3A257"/><rect x="0" y="-13" width="13" height="13" fill="#0E8E8A"/><rect x="-13" y="0" width="13" height="13" fill="#E6D2B0"/><rect x="0" y="0" width="13" height="13" fill="#F6F2EA"/></g></svg>`;
+const CREDS = `<ul class="creds"><li>Shipped worldwide from the UAE</li><li>ISO 13006 · EN 14411</li><li>20ft · 40ft · pallets · air samples</li></ul>`;
+const SEAL = `<svg class="seal" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="sealp" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1-88 0"/></defs><circle cx="60" cy="60" r="58" fill="var(--noir)"/><text><textPath href="#sealp" textLength="272" lengthAdjust="spacing">THE TRADE HUB · RAS AL KHAIMAH · WORLDWIDE ·</textPath></text><g transform="translate(60 60) rotate(12)"><rect x="-13" y="-13" width="13" height="13" fill="#D3A257"/><rect x="0" y="-13" width="13" height="13" fill="#0E8E8A"/><rect x="-13" y="0" width="13" height="13" fill="#E6D2B0"/><rect x="0" y="0" width="13" height="13" fill="#F6F2EA"/></g></svg>`;
 const HERO_COPY = (cls='')=>`<div class="hero-copy ${cls}">
   <span class="kicker">Ras Al Khaimah · Jebel Ali · Worldwide</span>
   <h1 class="hero-h" style="margin-top:18px"><span class="ln"><span>Marble looks,</span></span><span class="ln"><span><em>straight</em> from</span></span><span class="ln"><span>the kiln.</span></span></h1>
@@ -223,13 +223,13 @@ const FLAM = [
 ];
 function heroA(){ return `<section class="hero hero-a"><div class="wrap hero-grid">${HERO_COPY()}
   <figure class="hero-pic"><div class="arch"><img src="img/mega-slabs-stone.jpg" alt="Kitchen with stone-look porcelain slab island and floor, RAK Ceramics" loading="eager"></div>
-    <figcaption class="tag"><span class="kicker">In this room</span><b>Stone-look slabs &amp; floor</b><small>Photo: RAK Ceramics</small></figcaption>${SEAL}</figure>
+    <figcaption class="tag"><span class="kicker">In this room</span><b>Stone-look slabs &amp; floor</b></figcaption>${SEAL}</figure>
 </div>${floats(FLA)}${floatsMobileSet(FLAM)}</section>`; }
 function heroB(){ return `<section class="hero hero-b"><img class="hb-img" src="img/mega-slabs-stone.jpg" alt="Kitchen with stone-look porcelain slab island and floor, RAK Ceramics" loading="eager"><div class="hb-shade"></div>
-  <div class="wrap">${HERO_COPY('on-dark')}</div><small class="hb-cred">Photo: RAK Ceramics</small>${SEAL}</section>`; }
+  <div class="wrap">${HERO_COPY('on-dark')}</div>${SEAL}</section>`; }
 function heroC(){ return `<section class="hero hero-c"><div class="wrap">${HERO_COPY('center')}</div>
   <div class="fan"><figure style="--r:-7deg;--y:40px"><img src="img/tiles-marble.jpg" alt="Marble-look porcelain bathroom, RAK Ceramics"></figure><figure class="mid" style="--r:0deg;--y:0px"><img src="img/mega-slabs-stone.jpg" alt="Stone-look slab kitchen, RAK Ceramics"></figure><figure style="--r:7deg;--y:40px"><img src="img/bricks.jpg" alt="Glazed green wall tiles behind a bath, RAK Ceramics"></figure></div>
-  <small class="hb-cred dark">Photos: RAK Ceramics</small>${floats(FL.filter(f=>f[0].startsWith('sp:')))}</section>`; }
+  ${floats(FL.filter(f=>f[0].startsWith('sp:')))}</section>`; }
 P.home = ()=>`
 ${HV==='b'?heroB():HV==='c'?heroC():heroA()}
 ${marquee(['Calacatta','60 × 120','Café noir','Polished','Grey silk','120 × 120','Lappato','Travertine','20ft · 40ft','Zellige glaze','Honed','Jebel Ali pallets'])}
@@ -238,7 +238,7 @@ ${cxBlock()}
   <span class="kicker">Two ways to buy</span><h2 class="split-lines" style="margin-top:16px;max-width:12ch">One factory. Two markets.</h2>
   <div class="split">
     <a class="card dark" href="#containers"><span class="chip" style="background:var(--copper);color:#fff">Worldwide</span><h3>Full containers to your port</h3>
-      <p>For importers, merchants, developers and contractors in any market who want factory-direct pricing on volume.</p>
+      <p>For importers, merchants, developers and contractors in any market who want volume pricing on full loads.</p>
       <ul><li>20ft ≈ 1,080 m² · 40ft ≈ 1,170 m²</li><li>Mix ranges and colours in one load</li><li>Made to ISO 13006 and EN 14411 (CE)</li></ul><span class="pill gold">Containers →</span></a>
     <a class="card lag" href="#pallets"><span class="chip" style="color:var(--noir)">UAE &amp; worldwide</span><h3>Pallets for fast orders</h3>
       <p>From our Jebel Ali warehouse, for jobs that can't wait for a full container.</p>
@@ -246,7 +246,7 @@ ${cxBlock()}
   </div></div></section>
 <section class="block b-gold hstrip" id="hs"><div class="wrap"><span class="kicker">The collections</span><h2 class="split-lines" style="margin:16px 0 40px">Every look a modern home asks for.</h2><p class="swipe-hint">Swipe to explore <span>→</span></p></div>
   <div class="htrack">${D.collections.map(c=>`<a class="hcard" href="#${c.id}"><div class="ph"><img src="${c.img}" alt="${esc(c.name)} tiles in a room setting"></div><div class="tx"><span class="chip">${esc(c.kicker)}</span><h3 style="margin-top:12px">${c.name}</h3><p>${esc(c.short)}</p></div></a>`).join('')}</div></section>
-<div class="band"><img src="img/mega-slabs-marble.jpg" alt="Kitchen with large marble-effect porcelain slabs" class="band-img"><div class="cap"><span class="kicker">Mega slabs</span><h3 style="font-family:var(--display);font-weight:400;font-size:2.2rem;line-height:1;margin-top:8px">Islands, walls and worktops in one piece.</h3><small>Photo: RAK Ceramics</small></div></div>
+<div class="band"><img src="img/mega-slabs-marble.jpg" alt="Kitchen with large marble-effect porcelain slabs" class="band-img"><div class="cap"><span class="kicker">Mega slabs</span><h3 style="font-family:var(--display);font-weight:400;font-size:2.2rem;line-height:1;margin-top:8px">Islands, walls and worktops in one piece.</h3></div></div>
 <section class="block b-noir"><div class="wrap"><span class="kicker" style="color:var(--gold)">By the numbers (approximate)</span><h2 class="split-lines" style="margin-top:16px;max-width:13ch">Heavy goods, simple maths.</h2>
   <div class="stats">
     <div class="stat"><b data-count="1080">1,080</b><span>m² of 60 × 120 in a 20ft</span></div>
@@ -265,7 +265,7 @@ ${cta('Ready when your next job is.')}`;
 
 P.tiles = ()=> head('Tiles','Tiles for every <em>room</em>.','Six families of RAK porcelain and ceramic tile. Marble leads our range; everything else can ride in the same container.','b-onyx') + `
 <section class="block b-white"><div class="wrap"><div class="grid3">${D.collections.map(c=>`<a class="tile-card" href="#${c.id}" style="background:var(--onyx)"><div class="ph"><img src="${c.img}" alt="${esc(c.name)} tiles" loading="lazy"></div><div class="tx"><span class="chip" style="background:#fff">${esc(c.kicker)}</span><h3 style="margin-top:12px">${c.name}</h3><p style="margin-top:8px;font-size:.95rem">${esc(c.short)}</p></div></a>`).join('')}</div>
-<p class="note" style="margin-top:24px">Photos: RAK Ceramics. Range availability changes; ask us for current lines and colours.</p></div></section>${cta()}`;
+<p class="note" style="margin-top:24px">Range availability changes; ask us for current lines and colours.</p></div></section>${cta()}`;
 
 function linesTable(){
   return `<div class="tscroll"><table class="tbl stack"><thead><tr><th>Range / colour</th><th>Finish</th><th>Size</th><th>RAK code</th><th>Our price</th></tr></thead><tbody>${D.lines.map(l=>`<tr><td data-label="Range"><a href="#line-${l.id}">${esc(l.range)} ${esc(l.colour)}</a></td><td data-label="Finish">${l.finish}</td><td data-label="Size" style="white-space:nowrap">${l.size}</td><td data-label="RAK code" class="mono" style="font-size:.8rem">${l.code}</td><td data-label="Price" class="por">On request</td></tr>`).join('')}</tbody></table></div>
@@ -277,7 +277,7 @@ function collectionPage(c){
   <div><span class="kicker">${esc(c.kicker)}</span><p class="lead" style="margin-top:14px">${esc(c.body)}</p>
   <h3 style="margin-top:28px">Where it works</h3><ul style="margin:10px 0 0 18px">${c.uses.map(u=>`<li>${esc(u)}</li>`).join('')}</ul>
   <div class="ctas" style="margin-top:28px"><a class="pill" href="#quote">Ask for ${esc(c.name.toLowerCase())} prices</a><a class="pill ghost" href="#calculator">Calculator</a></div>
-  <p class="note">Photo: RAK Ceramics.</p></div></div></section>
+</div></div></section>
 ${c.lines ? `<section class="block b-white"><div class="wrap"><span class="kicker">Lines we quote</span><h2 class="split-lines" style="margin-top:16px">Large-format marble.</h2>${linesTable()}</div></section>` : `<section class="block b-white"><div class="wrap"><span class="kicker">Lines</span><h2 class="split-lines" style="margin-top:16px;max-width:14ch">Ask for current colours.</h2><p class="lead" style="margin-top:20px">We quote ${esc(c.name.toLowerCase())} ranges per order from RAK's current collection. Tell us the look, size and finish and we'll send options with codes, box data and samples.</p></div></section>`}
 ${cta()}`;
 }
@@ -291,7 +291,7 @@ function linePage(l){
 <section class="block b-travertine"><div class="wrap"><span class="kicker">Pairs well with</span><div class="grid3">${rel.map(r=>`<a class="tile-card" href="#line-${r.id}"><div class="ph"><img src="${r.img}" alt="" loading="lazy"></div><div class="tx"><h3>${esc(r.range)} ${esc(r.colour)}</h3><p style="margin-top:6px">${r.finish} · ${r.size}</p></div></a>`).join('')}</div></div></section>${cta('Want this in a container?','b-lagoon')}`;
 }
 
-P.containers = ()=> head('Containers','By the <em>container</em>, worldwide.','For importers, merchants, developers and contractors in any market. Factory-direct RAK porcelain in 20ft or 40ft loads, mixed as you need, shipped to your port.','b-copper', famSwitch('containers'), FAM.word) + `
+P.containers = ()=> head('Containers','By the <em>container</em>, worldwide.','For importers, merchants, developers and contractors in any market. RAK porcelain in 20ft or 40ft loads, mixed as you need, shipped to your port.','b-copper', famSwitch('containers'), FAM.word) + `
 <section class="block b-onyx"><div class="wrap grid2"><div><span class="kicker">20ft or 40ft?</span><h2 class="split-lines" style="margin-top:16px">Pick by weight.</h2></div><div>
  <div class="tscroll"><table class="tbl"><thead><tr><th></th><th>20ft</th><th>40ft</th></tr></thead><tbody>
  <tr><td>Tile we load (incl. pallets)</td><td>≈ 23 t</td><td>≈ 25 t</td></tr>
@@ -366,7 +366,6 @@ P.about = ()=> head('About','A trading desk <em>beside</em> the factory.','','b-
 <p>We are not RAK Ceramics, and we are not one of RAK's appointed distributors. We are a trade buyer that plans loads, handles export paperwork and quotes in writing.</p>
 <p class="note">Trade licence: ${esc(C.licence)}</p></div></div></section>${cta()}`;
 P.textiles = ()=> head('Textiles','Textiles, <em>coming soon</em>.','Our second line is on its way. We are adding ranges now.','b-copper') + `<section class="block b-onyx"><div class="wrap grid2"><div><span class="kicker">What's next</span><h2 class="split-lines" style="margin-top:16px">Watch this space.</h2></div><div class="article"><p class="lead">Tell us what you're looking for and we'll let you know when the first ranges are live.</p><div class="ctas" style="margin-top:24px"><a class="pill" href="#quote">Register interest</a><a class="pill ghost" href="#tiles">Back to tiles</a></div></div></div></section>`;
-P.credits = ()=> head('Credits','Thank you.','','b-silk') + `<section class="block b-onyx"><div class="wrap article"><h3>Photography</h3><p>Product and room photography courtesy of RAK Ceramics (rakceramics.com, onlineshop.rakceramics.com), used with permission. Some marble swatches on product pages are illustrations and are labelled as such.</p><h3>Type</h3><p>Instrument Serif, Hanken Grotesk and JetBrains Mono, via Google Fonts.</p><h3>Code</h3><p>GSAP and ScrollTrigger (GreenSock), Lenis smooth scroll.</p><h3>Trademarks</h3><p>RAK Ceramics, Tech-Marble, Amani Marble, Maximus and other range names belong to RAK Ceramics PJSC.</p></div></section>`;
 P.quote = ()=> head('Get a quote','Let\'s <em>price</em> it.','Quotes are written per order. Tell us as much as you know; we\'ll fill in the rest.','b-lagoon') + `
 <section class="block b-onyx"><div class="wrap grid2"><form id="qf"><div class="f">
 <label>Your name<input name="name" required></label><label>Company<input name="company"></label>
@@ -392,7 +391,7 @@ P.notfound = ()=> head('Not found','That tile\'s <em>missing</em>.','The page yo
 /* ---------- router ---------- */
 function resolve(h){
   if(!h || h==='home') return ['home', P.home];
-  const alias={'uk-trade':'containers','compliance':'standards','uae-pallets':'pallets'}; if(alias[h]) h=alias[h];
+  const alias={'credits':'home','uk-trade':'containers','compliance':'standards','uae-pallets':'pallets'}; if(alias[h]) h=alias[h];
   if(P[h]) return [h, P[h]];
   const c=col(h); if(c) return [h, ()=>collectionPage(c)];
   if(h.startsWith('line-')){ const l=D.lines.find(x=>'line-'+x.id===h); if(l) return [h, ()=>linePage(l)]; }
