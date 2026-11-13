@@ -453,7 +453,7 @@ function render(){
   $$('.nav a.l').forEach(a=>a.classList.toggle('on', a.getAttribute('href')==='#'+key));
   $('.sheet').classList.remove('open'); document.body.classList.remove('noscroll'); if(lenis) lenis.start();
   window.scrollTo(0,0); if(lenis) lenis.scrollTo(0,{immediate:true});
-  document.title = (key==='home'?'':(($('h1')||{}).textContent||'').replace(/\s+/g,' ').trim()+' · ') + 'The Trade Hub: RAK tiles by the container, worldwide';
+  document.title = (key==='home'?'':(($('h1')||{}).textContent||'').replace(/\s+/g,' ').trim()+' · ') + 'The Trade Hub: tiles, toilets and insulation, worldwide';
   initCX(); initCalc(); initQuote(); motion();
   $('.mbar').classList.toggle('show', !$('.hero'));
   if(hasG()){ let t; const rf=()=>{ clearTimeout(t); t=setTimeout(()=>ScrollTrigger.refresh(),120); };
