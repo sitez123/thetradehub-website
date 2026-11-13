@@ -34,16 +34,16 @@ window.TH = {
         ["Colours", "White · Ivory · Matt black (L-175B) · Gold electroplated (L175G)"],
         ["Gold version", "L175G: siphonic one-piece, 730 × 350 × 800 mm"]
       ],
-      variants: [["L175W","White","#F4F2EE"],["L175P","White, P-trap","#F4F2EE"],["L175","Ivory","#EEE4CF"],["L-175B","Matt black","#2B2826"],["L175G","Gold","#C9A45A"]]
+      variants: [["L175W","White","img/p/sv-l175-front.jpg"],["L175W","Installed","img/p/sv-l175-room.jpg"],["L175","Ivory & white","img/p/sv-l175-ivory.jpg"],["L-175B","Matt black","img/p/sv-l175b.jpg"],["L175G","Gold","img/p/sv-l175g.jpg"],["L175P","P-trap","img/p/sv-l175p.jpg"]]
     },
     range: [
-      ["L175", "One-piece", "S-trap or P-trap", "720 × 360 × 810", "White, ivory, matt black, gold"],
-      ["L136", "One-piece", "S-trap", "—", "Glossy white"],
-      ["L138", "One-piece, washdown", "S-trap, 250 mm", "680 × 365 × 785", "White"],
-      ["L139", "Floor-standing", "S-trap, 250 mm", "670 × 365 × 770", "Alpine white"],
-      ["L803", "One-piece, elongated", "S-trap", "—", "Glossy white"],
-      ["2051A", "Close-coupled, rimless", "S-trap, 250 mm", "690 × 355 × 835", "White"],
-      ["F805", "Wall-hung, concealed cistern", "—", "505 × 360 × 360", "Matt black"]
+      ["L175", "One-piece", "S-trap or P-trap", "720 × 360 × 810", "White, ivory, matt black, gold", "img/p/sv-l175-front.jpg"],
+      ["L136", "One-piece", "S-trap", "—", "Glossy white", "img/p/sv-l136.jpg"],
+      ["L138", "One-piece, washdown", "S-trap, 250 mm", "680 × 365 × 785", "White", "img/p/sv-l138.jpg"],
+      ["L139", "Floor-standing", "S-trap, 250 mm", "670 × 365 × 770", "Alpine white", "img/p/sv-l139.jpg"],
+      ["L803", "One-piece, elongated", "S-trap", "—", "Glossy white", "img/p/sv-l803.jpg"],
+      ["2051A", "Close-coupled, rimless", "P-trap, 180 mm", "690 × 355 × 835", "White", "img/p/sv-2051a.jpg"],
+      ["F805", "Wall-hung, concealed cistern", "—", "505 × 360 × 360", "Matt black", "img/p/sv-f805.jpg"]
     ]
   },
 
