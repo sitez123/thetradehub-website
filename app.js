@@ -58,138 +58,211 @@ function footer(){
   <div class="wordmark" aria-hidden="true">The Trade Hub</div></div></footer>`;
 }
 
-/* ---------- container explainer (signature) ---------- */
-const MODES = {
-  c20: { name:'20ft container', cols:8, rows:5, fill:23, unit:'tonne', m2:1080, t:23, boxes:750, w:340,
-         note:'A 20ft fills by <b>weight</b>, not space: about 23 t of tile on pallets, roughly 1,080 m² of 60 × 120 (about 25 t with the box). Empty space is normal.' },
-  c40: { name:'40ft container', cols:16, rows:5, fill:25, unit:'tonne', m2:1170, t:25, boxes:810, w:620,
-         note:'Twice the space, but only ~8% more tile: about 25 t (1,170 m²) keeps the lorry legal on 44-tonne roads, and less in 40-tonne countries. Fill the rest with lighter goods such as sanitaryware.' },
-  pal: { name:'Jebel Ali pallet', cols:6, rows:5, fill:30, unit:'box', m2:43.2, t:0.92, boxes:30, w:210,
-         note:'A pallet from our Jebel Ali warehouse: 30 boxes of 60 × 120 = 43.2 m², about 920 kg. Delivered across the UAE or shipped worldwide for fast orders.' }
+/* ---------- load builder (signature): every product mix, container or pallet ---------- */
+// Unit figures (approximate): tile pallet of 60 × 120 (30 boxes, 43.2 m²); boxed one-piece WC; 100 mm Spacesaver roll, packed.
+const U = { tile:{ t:.92, v:.70, m2:43.2 }, wc:{ t:.040, v:.30 }, roll:{ t:.01415, v:.29, m2:14.13 } };
+const CELL_V = .70; // one block in the container picture ≈ 0.7 m³
+const VESSEL = {
+  c20:{ name:'20ft container', cols:8,  rows:5, capT:23, capV:28 },
+  c40:{ name:'40ft container', cols:16, rows:5, capT:25, capV:56 }
 };
-const MIX = {
-  c20:{ tileN:16, sanN:12, m2:750, tT:16, sT:3, pcs:120, note:'<b>Example mixed 20ft:</b> about 750 m² of tile low down, then about 120 boxed WCs, basins, baths and trays stacked on top, ≈ 19 t. You use more of the space and still stay under the weight limit.' },
-  pal:{ tileN:12, sanN:18, m2:17.3, tT:0.35, sT:0.4, pcs:18, note:'<b>Example mixed pallet:</b> 12 boxes of tile (about 17 m²) plus 18 boxed WCs and basins, about 0.8 t. Ideal for a fast replacement order shipped anywhere.' },
-  c40:{ tileN:18, sanN:24, m2:840, tT:18, sT:6, pcs:240, note:'<b>Example mixed 40ft:</b> about 840 m² of tile on the floor plus about 240 boxed sanitaryware pieces on top, ≈ 24 t (about 28 t with the box). This is where a 40ft beats a 20ft.' }
+const LOADS = [['t','Tiles'],['w','Toilets'],['i','Insulation'],['tw','Tiles + toilets'],['ti','Tiles + insulation'],['twi','All three'],['x','Your mix']];
+// "Your mix": the visitor's own quantities. Pallets are planned to about 1.8 m high and 1 t.
+const MIXIN = { c20:{tile:15,wc:30,roll:20}, c40:{tile:20,wc:80,roll:60}, pal:{box:12,wc:1,roll:2} };
+const MIXF = { c:[['tile','Tile pallets',1,60],['wc','Boxed WCs',5,400],['roll','Rolls',5,400]], pal:[['box','Tile boxes',3,60],['wc','Boxed WCs',1,8],['roll','Rolls',1,12]] };
+const PAL_MAX = { h:180, kg:1000 };
+function palMix(v){ // two columns on the pallet; each item goes on the lower column
+  const top=[], col=[0,0], items=[...Array(v.wc).fill('wc'), ...Array(v.roll).fill('roll')];
+  items.forEach(t=>{ const c=col[0]<=col[1]?0:1; top.push([t, t==='wc'?(c?63:10):(c?62:8), col[c]]); col[c]+= t==='wc'?87:52; });
+  return { box:v.box, top, h:Math.round(15+v.box*2.2+Math.max(col[0],col[1])) }; }
+const PLAN = {
+  c20:{ t:{tile:25}, w:{wc:90}, i:{roll:96}, tw:{tile:18,wc:50}, ti:{tile:20,roll:46}, twi:{tile:16,wc:30,roll:25} },
+  c40:{ t:{tile:27}, w:{wc:185}, i:{roll:193}, tw:{tile:21,wc:135}, ti:{tile:25,roll:132}, twi:{tile:20,wc:80,roll:60} }
 };
-const SAN = [ // little sanitaryware pictograms (36×36 cell)
+const NOTE = {
+  c20:{ t:'Tiles alone fill a 20ft by <b>weight</b>: 25 pallets, about 1,080 m² and 23 t, with a third of the box still empty.',
+        w:'Toilets fill a 20ft by <b>space</b>: about 90 boxed one-piece WCs, only around 3.6 t.',
+        i:'Glass wool is the lightest load: about 96 rolls (≈ 1,360 m² at 100 mm), only around 1.4 t. Full by space.',
+        tw:'18 tile pallets on the floor and about 50 boxed WCs above: ≈ 18.6 t, and the box is full.',
+        ti:'20 tile pallets with about 46 rolls on top: ≈ 19 t. The rolls use space the tile can\'t.',
+        twi:'All three in one box: 16 tile pallets, about 30 WCs and 25 rolls, ≈ 16.3 t.' },
+  c40:{ t:'A 40ft takes only 27 tile pallets (≈ 1,170 m², 25 t) before the road weight limit. Two thirds of the box stay empty.',
+        w:'About 185 boxed WCs fill a 40ft by space, at only around 7.4 t.',
+        i:'About 190 rolls (≈ 2,700 m² at 100 mm), under 3 t. Full by space.',
+        tw:'21 tile pallets plus about 135 WCs: ≈ 24.7 t and full. The best use of a 40ft.',
+        ti:'25 tile pallets plus about 130 rolls: ≈ 24.9 t. The rolls ride in space the tile leaves empty.',
+        twi:'20 tile pallets, about 80 WCs and 60 rolls: ≈ 22.5 t, full by space.' }
+};
+// Pallets: drawn side-on. box = tile boxes (≈ 2.2 cm each); top = items on the boxes: [type, x cm, y cm above the boxes]
+const PAL = {
+  t:  { box:30, top:[], note:'30 boxes of 60 × 120 = 43.2 m², about 0.9 t. Delivered across the UAE or shipped worldwide.' },
+  w:  { box:0, top:[['wc',10,0],['wc',63,0],['wc',10,87],['wc',63,87]], note:'4 boxed one-piece WCs, two layers of two: about 0.2 t, ≈ 1.9 m high. For replacements that can\'t wait.' },
+  i:  { box:0, top:[['roll',8,0],['roll',62,0],['roll',8,52],['roll',62,52],['roll',8,104],['roll',62,104]], note:'6 packed rolls, about 85 m² at 100 mm and only around 0.1 t: light enough to add to any order.' },
+  tw: { box:15, top:[['wc',10,0],['wc',63,0]], note:'15 boxes of tile (21.6 m²) with 2 boxed WCs on top: about 0.5 t, one delivery.' },
+  ti: { box:15, top:[['roll',8,0],['roll',62,0],['roll',8,52],['roll',62,52]], note:'15 boxes of tile with 4 rolls on top: about 0.5 t.' },
+  twi:{ box:12, top:[['wc',8,0],['roll',62,0],['roll',62,52]], note:'12 boxes of tile, a boxed WC and 2 rolls: about 0.45 t on one pallet.' }
+};
+const PALK = { box:29, pallet:25, wc:40, roll:14.15 };
+const SAN = [ // pictograms (36×36 cell)
   '<path d="M9 9h7v12H9zM13 21h15a0 0 0 0 1 0 0c0 5-4 8-9 8h-2l1 4h-6l1-4c-2-1-3-3-3-6z" />',            // WC
-  '<path d="M6 17h24c0 6-5 10-12 10S6 23 6 17zM18 9v8M14 9h8" />',                                          // basin + tap
-  '<path d="M4 16h28v4c0 6-4 9-10 9H14C8 29 4 26 4 20zM8 16V9a3 3 0 0 1 6 0M9 29l-1 3M27 29l1 3" />',      // bath
-  '<rect x="6" y="12" width="24" height="16" rx="2"/><circle cx="18" cy="20" r="2"/>',                     // shower tray
-  '<circle cx="18" cy="17" r="10"/><path d="M14 13a6 6 0 0 1 5-3" />'                                        // mirror
+  '<path d="M6 17h24c0 6-5 10-12 10S6 23 6 17zM18 9v8M14 9h8" />'                                           // basin + tap
 ];
-let cxMix=false;
-const FAM = D.families.find(f=>f.ready); const FAM_ = 0; const PAT = FAM.blockImgs;
+const ROLL_ICON = '<circle cx="18" cy="18" r="12"/><path d="M18 18m0 0c2 0 3 2 2 4s-5 2-6-1 1-7 5-7 8 3 7 8-6 9-11 7" />';
+const FAM = D.families.find(f=>f.ready); const PAT = FAM.blockImgs;
 const AIRCOL=['#E9E4DC','#463B37','#C9CFD1','#2F5A52','#F1EEE8','#A29D99','#A08A6E','#B9A385'];
 const AIR = { boxes:24, m2PerBox:1.44, kgBox:29, wc:30, basin:18, pallet:12,
   note:'<b>Distributor sample pallet by air:</b> 120 × 100 cm plastic pallet (no fumigation needed), 24 boxes across 6–8 ranges in the base, a boxed WC and basin on top. About 153 cm high and 0.76 t: inside the ≈ 160 cm belly-hold limit and the aircraft floor-load limit.' };
+let cxMode='c20', cxLoad='t', cxP=0;
+const fmt=(v,d=0)=>v.toLocaleString('en-GB',{maximumFractionDigits:d,minimumFractionDigits:d});
 function cxSVG(){
   const pats = PAT.map((p,i)=>`<pattern id="p${i}" patternUnits="objectBoundingBox" width="1" height="1"><image href="img/${p}.jpg" width="60" height="44" preserveAspectRatio="xMidYMid slice"/></pattern>`).join('');
-  return `<svg class="cx-svg" viewBox="0 0 680 320" role="img" aria-label="Container filling with tiles"><defs>${pats}
+  return `<svg class="cx-svg" viewBox="0 0 680 320" role="img" aria-label="Load builder"><defs>${pats}
     <pattern id="rib" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#b8562f"/><rect width="4" height="10" fill="#a94c28"/></pattern></defs>
     <g id="cxg"></g></svg>`;
 }
-let cxMode='c20', cxP=0;
+const iconCell=(x,y,cell,bg,icon,sw=1.6)=>`<g transform="translate(${x} ${y})"><rect width="${cell}" height="${cell}" rx="3" fill="${bg}"/><g fill="none" stroke="#2A201C" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${icon}</g></g>`;
+function setStats(t, sp, spLabel, m2, contents, note){
+  $('#cx-t').textContent=t; $('#cx-v').textContent=sp; $('#cx-vl').textContent=spLabel; $('#cx-m2').textContent=m2;
+  $('#cx-c').innerHTML=contents; $('#cx-note').innerHTML=note;
+  const sl=$('#cx-range'); if(sl && document.activeElement!==sl) sl.value=Math.round(cxP*100);
+  const lg=$('#cx-load'); if(lg) lg.hidden = cxMode==='air';
+  const mi=$('#cx-mixin'); if(mi){ mi.hidden = !(cxLoad==='x' && cxMode!=='air'); if(!mi.hidden && mi.dataset.for!==(cxMode==='pal'?'pal':'c')) buildMixIn(); }
+}
+function buildMixIn(){
+  const mi=$('#cx-mixin'), key=cxMode==='pal'?'pal':'c'; mi.dataset.for=key;
+  mi.innerHTML=MIXF[key].map(([k,lab,st,max])=>`<label class="mx"><span>${lab}</span><button type="button" data-k="${k}" data-d="-${st}" aria-label="Fewer ${lab.toLowerCase()}">−</button><input type="number" inputmode="numeric" min="0" max="${max}" step="${st}" data-k="${k}" aria-label="${lab}"><button type="button" data-k="${k}" data-d="${st}" aria-label="More ${lab.toLowerCase()}">+</button></label>`).join('');
+  fillMixIn();
+  mi.querySelectorAll('button').forEach(b=>b.onclick=()=>{ const v=MIXIN[cxMode]; const f=MIXF[key].find(x=>x[0]===b.dataset.k); v[b.dataset.k]=Math.max(0,Math.min(f[3],(v[b.dataset.k]||0)+(+b.dataset.d))); fillMixIn(); cxP=1; drawCX(); });
+  mi.querySelectorAll('input').forEach(i=>i.oninput=()=>{ const v=MIXIN[cxMode]; const f=MIXF[key].find(x=>x[0]===i.dataset.k); v[i.dataset.k]=Math.max(0,Math.min(f[3],Math.round(+i.value||0))); cxP=1; drawCX(); });
+}
+function fillMixIn(){ const v=MIXIN[cxMode]; $$('#cx-mixin input').forEach(i=>{ if(document.activeElement!==i) i.value=v[i.dataset.k]||0; }); }
+function drawContainer(g){
+  const m=VESSEL[cxMode], mine=cxLoad==='x', p= mine ? MIXIN[cxMode] : PLAN[cxMode][cxLoad];
+  const parts=[['tile',p.tile||0],['wc',p.wc||0],['roll',p.roll||0]].filter(x=>x[1]>0)
+    .map(([k,n])=>({k, n, cells: k==='tile'? n : Math.round(n*U[k].v/CELL_V)}));
+  const seq=[]; parts.forEach(pt=>{ for(let i=0;i<pt.cells;i++) seq.push(pt.k); });
+  const total=m.cols*m.rows, shown=Math.round(cxP*seq.length);
+  const cell=36, gap=3, iw=m.cols*(cell+gap)+gap, ih=m.rows*(cell+gap)+gap, x0=(680-iw)/2, y0=300-ih-14;
+  let s=`<rect x="${x0-14}" y="${y0-14}" width="${iw+28}" height="${ih+28}" rx="6" fill="url(#rib)"/><rect x="${x0}" y="${y0}" width="${iw}" height="${ih}" fill="#2a201c" opacity=".88"/>`;
+  s+=`<text x="${x0-14}" y="${y0-24}" fill="currentColor" font-family="JetBrains Mono" font-size="13">${m.name.toUpperCase()} · ${LOADS.find(l=>l[0]===cxLoad)[1].toUpperCase()}</text>`;
+  let k=0;
+  for(let r=m.rows-1;r>=0;r--) for(let c=0;c<m.cols;c++){
+    const x=x0+gap+c*(cell+gap), y=y0+gap+r*(cell+gap);
+    if(k<shown){ const t=seq[k];
+      s+= t==='tile' ? `<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="url(#p${k%PAT.length})" stroke="rgba(255,255,255,.5)" stroke-width="1"/>`
+        : t==='wc' ? iconCell(x,y,cell,'#F6F2EA',SAN[0]) : iconCell(x,y,cell,'#F2CE52',ROLL_ICON,1.5); }
+    else if(k<total) s+=`<rect x="${x+.5}" y="${y+.5}" width="${cell-1}" height="${cell-1}" rx="3" fill="none" stroke="rgba(255,255,255,.18)" stroke-dasharray="3 3"/>`;
+    k++;
+  }
+  g.innerHTML=s; g.ownerSVGElement.setAttribute('viewBox', `${x0-44} ${y0-60} ${iw+88} ${ih+118}`);
+  // figures scale with what is loaded so far, category by category
+  let done=shown, T=0, V=0, m2=0; const got={};
+  parts.forEach(pt=>{ const f=Math.max(0,Math.min(1, done/pt.cells)); done-=pt.cells; const n=pt.n*f; got[pt.k]=n; T+=n*U[pt.k].t; V+=n*U[pt.k].v; if(pt.k==='tile') m2+=n*U.tile.m2; });
+  const full=cxP>.999, byW = (T/m.capT) >= (V/m.capV);
+  if(mine){ // the visitor's own load: does it fit?
+    const allT=parts.reduce((a,pt)=>a+pt.n*U[pt.k].t,0), allV=parts.reduce((a,pt)=>a+pt.n*U[pt.k].v,0);
+    const overT=allT-m.capT, overV=allV-m.capV, fits=overT<=0 && overV<=0;
+    const msg = fits ? `<b>It fits.</b> ${fmt(allT,1)} t of the ${m.capT} t we load a ${m.name.replace(' container','')} to, and ${fmt(allV/m.capV*100)}% of the space. ${allT/m.capT>allV/m.capV?'Weight is the limit to watch.':'Space is the limit to watch.'}`
+      : `<b>Too much for one ${m.name.replace(' container','')}.</b> ${overT>0?`Over the weight limit by ${fmt(overT,1)} t. `:''}${overV>0?`Over the space by about ${fmt(overV,1)} m³. `:''}Take some out, switch to a 40ft, or split it across two containers.`;
+    const c=[]; parts.forEach(pt=>{ const n=got[pt.k]; if(pt.k==='tile') c.push(`<span><i class="ci tl"></i>${fmt(n)} tile pallets · ${fmt(n*U.tile.m2)} m²</span>`); if(pt.k==='wc') c.push(`<span><i class="ci wc"></i>${fmt(n)} boxed WCs</span>`); if(pt.k==='roll') c.push(`<span><i class="ci rl"></i>${fmt(n)} rolls · ${fmt(n*U.roll.m2)} m²</span>`); });
+    if(full) c.push(`<span class="lim ${fits?'ok':'over'}">${fits?'Fits':'Over the limit'}</span>`);
+    return setStats(fmt(T,1), fmt(V/m.capV*100), '% of the space', fmt(m2), c.join(''), msg);
+  }
+  const c=[]; if(got.tile!=null) c.push(`<span><i class="ci tl"></i>${fmt(got.tile)} tile pallets</span>`); if(got.wc!=null) c.push(`<span><i class="ci wc"></i>${fmt(got.wc)} boxed WCs</span>`); if(got.roll!=null) c.push(`<span><i class="ci rl"></i>${fmt(got.roll)} rolls · ${fmt(got.roll*U.roll.m2)} m²</span>`);
+  if(full) c.push(`<span class="lim">${byW?'Weight limit reached':'Full by space'}</span>`);
+  setStats(fmt(T,1), fmt(Math.min(100,V/m.capV*100)), '% of the space', fmt(m2), c.join(''), `<b>Example ${m.name.replace(' container','')}:</b> ${NOTE[cxMode][cxLoad]}`);
+}
+function drawPallet(g){
+  const mine=cxLoad==='x', P= mine ? palMix(MIXIN.pal) : PAL[cxLoad], u=2.5, W=120*u, x0=60, base=300, palH=15*u, boxH=2.2*u;
+  const items=P.box+P.top.length, shown=Math.round(cxP*items);
+  let s=`<rect x="${x0-10}" y="${base-palH}" width="${W+20}" height="${palH*.4}" rx="3" fill="#b48659"/>`;
+  for(const fx of [0,.45,.9]) s+=`<rect x="${x0-10+(W+20)*fx}" y="${base-palH*.6}" width="${(W+20)*.1}" height="${palH*.6}" fill="#8d6640"/>`;
+  let y=base-palH; let bx=0;
+  for(let i=0;i<P.box;i++){ y-=boxH; const on=i<shown; if(on) bx++;
+    s+= on ? `<rect x="${x0+2}" y="${y}" width="${W-4}" height="${boxH-.6}" rx="1" fill="${AIRCOL[Math.floor(i/3)%AIRCOL.length]}"/><rect x="${x0+2}" y="${y}" width="${W-4}" height=".8" fill="rgba(255,255,255,.35)"/>`
+           : `<rect x="${x0+2}" y="${y}" width="${W-4}" height="${boxH-.6}" fill="none" stroke="rgba(255,255,255,.15)" stroke-dasharray="2 2"/>`; }
+  const top=y; let wc=0, rl=0, maxY=top;
+  P.top.forEach(([t,xc,yc],j)=>{ const on=P.box+j<shown;
+    if(t==='wc'){ const w=45*u,h=85*u,X=x0+xc*u,Y=top-yc*u-h; maxY=Math.min(maxY,Y); if(on) wc++;
+      s+= on ? `<g><rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="4" fill="#F6F2EA"/><g transform="translate(${X+w/2-27} ${Y+h/2-27}) scale(1.5)" fill="none" stroke="#2A201C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${SAN[0]}</g></g>`
+             : `<rect x="${X}" y="${Y}" width="${w}" height="${h}" rx="4" fill="none" stroke="rgba(255,255,255,.25)" stroke-dasharray="4 4"/>`; }
+    else { const d=50*u, X=x0+xc*u, Y=top-yc*u-d; maxY=Math.min(maxY,Y); if(on) rl++;
+      s+= on ? `<g><circle cx="${X+d/2}" cy="${Y+d/2}" r="${d/2-2}" fill="#F2CE52"/><g transform="translate(${X+d/2-36} ${Y+d/2-36}) scale(2)" fill="none" stroke="#B88A1E" stroke-width="1.3" stroke-linecap="round">${ROLL_ICON}</g></g>`
+             : `<circle cx="${X+d/2}" cy="${Y+d/2}" r="${d/2-2}" fill="none" stroke="rgba(255,255,255,.25)" stroke-dasharray="4 4"/>`; }
+  });
+  const hcm=Math.round((base-maxY)/u);
+  s+=`<text x="${x0-10}" y="${maxY-16}" fill="currentColor" font-family="JetBrains Mono" font-size="13">PALLET · ${LOADS.find(l=>l[0]===cxLoad)[1].toUpperCase()}</text>`;
+  s+=`<text x="${x0-10}" y="${base+22}" fill="currentColor" font-family="JetBrains Mono" font-size="12">120 × 100 cm · ≈ ${hcm} cm high</text>`;
+  if(mine){ const ly=base-PAL_MAX.h*u; s+=`<line x1="${x0-30}" y1="${ly}" x2="${x0+W+30}" y2="${ly}" stroke="#F6F2EA" stroke-dasharray="6 5" opacity=".7"/><text x="${x0+W+34}" y="${ly+4}" fill="currentColor" font-family="JetBrains Mono" font-size="12">${PAL_MAX.h} cm</text>`; }
+  g.innerHTML=s; const vy=Math.min(maxY-40, base-200*u); g.ownerSVGElement.setAttribute('viewBox', `20 ${vy} ${W+130} ${base-vy+40}`);
+  const kg=(shown>0?PALK.pallet:0)+bx*PALK.box+wc*PALK.wc+rl*PALK.roll;
+  const c=[]; if(P.box) c.push(`<span><i class="ci tl"></i>${bx} boxes of tile</span>`); if(P.top.some(t=>t[0]==='wc')) c.push(`<span><i class="ci wc"></i>${wc} boxed WC${wc===1?'':'s'}</span>`); if(P.top.some(t=>t[0]==='roll')) c.push(`<span><i class="ci rl"></i>${rl} rolls · ${fmt(rl*U.roll.m2)} m²</span>`);
+  let note=`<b>Example pallet:</b> ${P.note}`;
+  if(mine){ const v=MIXIN.pal, allKg=PALK.pallet+v.box*PALK.box+v.wc*PALK.wc+v.roll*PALK.roll, allH=palMix(v).h, fits=allKg<=PAL_MAX.kg && allH<=PAL_MAX.h;
+    note = fits ? `<b>It fits on one pallet.</b> About ${fmt(allKg)} kg and ${allH} cm high, inside the ${PAL_MAX.h} cm and ${fmt(PAL_MAX.kg)} kg we plan a pallet to.`
+                : `<b>Too much for one pallet.</b> ${allH>PAL_MAX.h?`${allH} cm high against our ${PAL_MAX.h} cm. `:''}${allKg>PAL_MAX.kg?`${fmt(allKg)} kg against our ${fmt(PAL_MAX.kg)} kg. `:''}Split it across two pallets, or step up to a container.`;
+    if(cxP>.999) c.push(`<span class="lim ${fits?'ok':'over'}">${fits?'Fits':'Over the limit'}</span>`); }
+  setStats(fmt(kg/1000,2), fmt(cxP>.999?hcm:Math.round(hcm*cxP)), 'cm high', fmt(bx*1.44,1), c.join(''), note);
+}
 function drawAir(g){
   const u=2.5, W=120*u, x0=60, base=300, palH=15*u, boxH=2.2*u, n=AIR.boxes;
   const total=n+2, shown=Math.round(cxP*total);
   let s='';
-  // height limit line at 160 cm
   const lim=base-160*u;
   s+=`<line x1="${x0-30}" y1="${lim}" x2="${x0+W+30}" y2="${lim}" stroke="#F6F2EA" stroke-dasharray="6 5" opacity=".7"/><text x="${x0+W+34}" y="${lim+4}" fill="currentColor" font-family="JetBrains Mono" font-size="12">160 cm max</text>`;
-  // plastic pallet
   s+=`<rect x="${x0}" y="${base-palH}" width="${W}" height="${palH*.35}" rx="3" fill="#2A201C"/>`;
   for(const fx of [0,.45,.9]) s+=`<rect x="${x0+W*fx}" y="${base-palH*.65}" width="${W*.1}" height="${palH*.65}" rx="2" fill="#2A201C"/>`;
   let y=base-palH;
   for(let k=0;k<n;k++){ y-=boxH; if(k<shown){ const col=AIRCOL[Math.floor(k/3)%AIRCOL.length]; s+=`<rect x="${x0+2}" y="${y}" width="${W-4}" height="${boxH-.6}" rx="1" fill="${col}"/><rect x="${x0+2}" y="${y}" width="${W-4}" height=".8" fill="rgba(255,255,255,.35)"/>`; }
     else s+=`<rect x="${x0+2}" y="${y}" width="${W-4}" height="${boxH-.6}" fill="none" stroke="rgba(255,255,255,.15)" stroke-dasharray="2 2"/>`; }
-  const top=y; // WC carton 45 × 85 cm, basin carton 65 × 25 cm
-  const wcW=45*u, wcH=85*u, bW=65*u, bH=25*u;
+  const top=y, wcW=45*u, wcH=85*u, bW=65*u, bH=25*u;
   const draw=(x,yy,w,h,icon,on)=> on ? `<g><rect x="${x}" y="${yy}" width="${w}" height="${h}" rx="4" fill="#F6F2EA"/><g transform="translate(${x+w/2-27} ${yy+h/2-27}) scale(1.5)" fill="none" stroke="#2A201C" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${icon}</g></g>`
                                      : `<rect x="${x}" y="${yy}" width="${w}" height="${h}" rx="4" fill="none" stroke="rgba(255,255,255,.25)" stroke-dasharray="4 4"/>`;
   s+=draw(x0+6, top-wcH, wcW, wcH, SAN[0], shown>n);
   s+=draw(x0+6+wcW+8, top-bH, bW, bH, SAN[1], shown>n+1);
-  // width label
   s+=`<text x="${x0}" y="${base+20}" fill="currentColor" font-family="JetBrains Mono" font-size="12">PLASTIC PALLET · 120 × 100 cm · tile box ≈ 2.2 cm</text>`;
-  g.innerHTML=s;
-  g.ownerSVGElement.setAttribute('viewBox', `20 ${lim-30} ${W+170} ${base-lim+60}`);
+  g.innerHTML=s; g.ownerSVGElement.setAttribute('viewBox', `20 ${lim-30} ${W+170} ${base-lim+60}`);
   const bx=Math.min(shown,n), kg=bx*AIR.kgBox+(shown>n?AIR.wc:0)+(shown>n+1?AIR.basin:0)+AIR.pallet*(shown>0?1:0);
-  const fmt=(v,d=0)=>v.toLocaleString('en-GB',{maximumFractionDigits:d,minimumFractionDigits:d});
-  $('#cx-m2').textContent=fmt(bx*AIR.m2PerBox,1); $('#cx-t').textContent=fmt(kg/1000,2); $('#cx-b').textContent=fmt(bx);
-  $('#cx-bl').textContent='boxes + WC + basin'; $('#cx-note').innerHTML=AIR.note;
-  const mb=$('#cx-mix'); if(mb) mb.hidden=true;
-  const sl=$('#cx-range'); if(sl && document.activeElement!==sl) sl.value=Math.round(cxP*100);
+  const c=[`<span><i class="ci tl"></i>${bx} boxes of tile</span>`,`<span><i class="ci wc"></i>${shown>n?1:0} WC · ${shown>n+1?1:0} basin</span>`];
+  setStats(fmt(kg/1000,2), fmt(Math.round(Math.min(153, 153*cxP))), 'cm high', fmt(bx*AIR.m2PerBox,1), c.join(''), AIR.note);
 }
 function drawCX(){
-  const g = $('#cxg'); if(!g) return;
+  const g=$('#cxg'); if(!g) return;
   if(cxMode==='air') return drawAir(g);
-  const m = MODES[cxMode];
-  const cell=36, gap=3, iw=m.cols*(cell+gap)+gap, ih=m.rows*(cell+gap)+gap;
-  const x0 = (680-iw)/2, y0 = 300-ih-14;
-  const mx = (cxMix && MIX[cxMode]) ? MIX[cxMode] : null;
-  const seq = mx ? Array(mx.tileN).fill('t').concat(Array(mx.sanN).fill('s')) : Array(m.fill).fill('t');
-  const shown = Math.round(cxP*seq.length);
-  let s='';
-  if(cxMode==='pal'){
-    s+=`<rect x="${x0-10}" y="${y0+ih}" width="${iw+20}" height="16" rx="3" fill="#b48659"/><rect x="${x0}" y="${y0+ih+16}" width="18" height="10" fill="#8d6640"/><rect x="${x0+iw/2-9}" y="${y0+ih+16}" width="18" height="10" fill="#8d6640"/><rect x="${x0+iw-18}" y="${y0+ih+16}" width="18" height="10" fill="#8d6640"/>`;
-    s+=`<text x="${x0-10}" y="${y0-12}" fill="currentColor" font-family="JetBrains Mono" font-size="13">PALLET${mx?' · MIXED':''} · each block = 1 box${mx?' or 1 piece':''}</text>`;
-  } else {
-    s+=`<rect x="${x0-14}" y="${y0-14}" width="${iw+28}" height="${ih+28}" rx="6" fill="url(#rib)"/><rect x="${x0}" y="${y0}" width="${iw}" height="${ih}" fill="#2a201c" opacity=".88"/>`;
-    s+=`<text x="${x0-14}" y="${y0-24}" fill="currentColor" font-family="JetBrains Mono" font-size="13">${m.name.toUpperCase()}${mx?' · MIXED LOAD':''}</text>`;
-  }
-  let k=0;
-  for(let r=m.rows-1;r>=0;r--) for(let c=0;c<m.cols;c++){
-    const x=x0+gap+c*(cell+gap), y=y0+gap+r*(cell+gap);
-    if(k<shown){
-      if(seq[k]==='t') s+=`<rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="3" fill="url(#p${k%PAT.length})" stroke="rgba(255,255,255,.5)" stroke-width="1"/>`;
-      else s+=`<g transform="translate(${x} ${y})"><rect width="${cell}" height="${cell}" rx="3" fill="#F6F2EA"/><g fill="none" stroke="#2A201C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${SAN[(k-mx.tileN)%SAN.length]}</g></g>`;
-    }
-    else if(k>=seq.length || cxMode==='pal'){ s+=`<rect x="${x+.5}" y="${y+.5}" width="${cell-1}" height="${cell-1}" rx="3" fill="none" stroke="rgba(255,255,255,.18)" stroke-dasharray="3 3"/>`; }
-    k++;
-  }
-  g.innerHTML=s;
-  const svg=g.ownerSVGElement, pad=cxMode==='pal'?40:44; svg.setAttribute('viewBox', `${x0-pad} ${y0-pad-16} ${iw+pad*2} ${ih+pad*2+30}`);
-  const fmt=(v,d=0)=>v.toLocaleString('en-GB',{maximumFractionDigits:d,minimumFractionDigits:d});
-  if(mx){
-    const ft=Math.min(shown,mx.tileN)/mx.tileN, fs=Math.max(0,shown-mx.tileN)/mx.sanN;
-    $('#cx-m2').textContent=fmt(mx.m2*ft, cxMode==='pal'?1:0); $('#cx-t').textContent=fmt(mx.tT*ft+mx.sT*fs, cxMode==='pal'?2:1); $('#cx-b').textContent=fmt(mx.pcs*fs);
-    $('#cx-bl').textContent='sanitary pieces'; $('#cx-note').innerHTML=mx.note;
-  } else {
-    const p=cxP;
-    $('#cx-m2').textContent = fmt(m.m2*p, m.m2<100?1:0);
-    $('#cx-t').textContent = fmt(m.t*p, m.t<5?2:1);
-    $('#cx-b').textContent = fmt(m.boxes*p);
-    $('#cx-bl').textContent='boxes'; $('#cx-note').innerHTML = m.note;
-  }
-  const mb=$('#cx-mix'); if(mb){ mb.hidden=false; mb.setAttribute('aria-pressed', cxMix); }
-  const sl=$('#cx-range'); if(sl && document.activeElement!==sl) sl.value=Math.round(cxP*100);
+  if(cxMode==='pal') return drawPallet(g);
+  drawContainer(g);
 }
-function cxBlock(start='c20'){
-  return `<section class="block b-lagoon" id="cx" data-start="${start}"><div class="wrap cx">
-    <div><span class="kicker">How tiles really ship</span><h2 class="split-lines" style="margin-top:16px">Tiles fill a box by <em>weight</em>.</h2>
-      <p class="lead" style="margin-top:20px">Scroll to load it. Switch between a 20ft, a 40ft, a pallet and an air sample pallet to see what you actually get.</p>
-      <div class="cx-toggle" role="group" aria-label="Load type">
-        <button data-m="c20" aria-pressed="true">20ft container</button><button data-m="c40" aria-pressed="false">40ft container</button><button data-m="pal" aria-pressed="false">Pallet</button><button data-m="air" aria-pressed="false">Air sample</button></div>
-      <button class="pill" id="cx-mix" type="button" aria-pressed="false" style="margin:0 0 6px;background:var(--onyx);color:var(--noir)">＋ Mixed load: tiles + sanitaryware</button>
-      <div class="cx-stats"><div><b id="cx-m2">0</b><span>m² of 60 × 120</span></div><div><b id="cx-t">0</b><span>tonnes</span></div><div><b id="cx-b">0</b><span id="cx-bl">boxes</span></div></div>
+function cxBlock(start='c20', load='t', free=false, only=null){
+  const VS=[['c20','20ft'],['c40','40ft'],['pal','Pallet'],['air','Air sample']].filter(v=>!only||only.includes(v[0]));
+  const pal=start==='pal';
+  return `<section class="block b-lagoon${free?' cx-free':''}" id="cx" data-start="${start}" data-load="${load}"><div class="wrap cx">
+    <div><span class="kicker">The load builder</span><h2 class="split-lines" style="margin-top:16px">${pal?'Build your <em>pallet</em>.':'Build your <em>container</em>.'}</h2>
+      <p class="lead" style="margin-top:20px">${pal?'Pick a ready-made pallet or set your own mix of tile boxes, WCs and rolls, and see the height and weight.':'Pick a ready-made load or set your own mix of tile pallets, WCs and rolls. Tile sits on the floor until the weight limit; toilets and rolls fill the space above.'}</p>
+      <div class="cx-toggle" role="group" aria-label="Container or pallet">${VS.map(v=>`<button data-m="${v[0]}" aria-pressed="${v[0]===start}">${v[1]}</button>`).join('')}</div>
+      <div class="cx-load" id="cx-load" role="group" aria-label="Load">${LOADS.map(l=>`<button type="button" data-l="${l[0]}" aria-pressed="${l[0]===load}">${l[1]}</button>`).join('')}</div>
+      <div class="cx-mixin" id="cx-mixin" hidden></div>
+      <div class="cx-stats"><div><b id="cx-t">0</b><span>tonnes</span></div><div><b id="cx-v">0</b><span id="cx-vl">% of the space</span></div><div><b id="cx-m2">0</b><span>m² of tile</span></div></div>
+      <p class="cx-c" id="cx-c"></p>
       <p class="cx-note" id="cx-note"></p>
       <label class="kicker" for="cx-range" style="display:block;margin-top:12px">Load it by hand</label><input id="cx-range" type="range" min="0" max="100" value="0">
-      <p class="note" style="opacity:.8">Approximate figures for 9 mm porcelain at 29 kg per 1.44 m² box. Exact loads depend on packing and the shipping line's weight limits.</p>
+      <p class="note" style="opacity:.8">Example plans, approximate: tile pallet of 60 × 120 ≈ 0.92 t and 0.7 m³; boxed one-piece WC ≈ 40 kg and 0.3 m³; 100 mm Spacesaver roll ≈ 14 kg and 0.29 m³ packed. Every quote comes with a load plan.</p>
     </div>
-    <div>${cxSVG()}<div class="legend"><span><i style="background:var(--gold)"></i>Marble</span><span><i style="background:var(--noir)"></i>Café noir</span><span><i style="background:var(--zellige)"></i>Glazed wall</span><span><i style="background:var(--oak)"></i>Wood plank</span><span><i style="background:var(--onyx)"></i>Sanitaryware (mixed load)</span><span><i style="border:1px dashed #fff"></i>Space left by the weight limit</span><span>Container: tile block ≈ 1 t, sanitary block ≈ 10 pieces · Pallet: 1 box or 1 piece per block</span></div></div>
+    <div>${cxSVG()}<div class="legend"><span><i style="background:linear-gradient(135deg,var(--gold),var(--noir))"></i>Tile</span><span><i style="background:var(--onyx)"></i>Boxed WC</span><span><i style="background:#F2CE52"></i>Insulation roll</span>${pal?'<span>Pallet drawn side-on: tile boxes ≈ 2.2 cm each, WC carton ≈ 85 cm high, packed roll ≈ 50 cm across</span>':'<span><i style="border:1px dashed #fff"></i>Empty space</span><span>1 block ≈ 0.7 m³: one tile pallet, about 2 WCs or 2 rolls</span>'}</div></div>
   </div></section>`;
 }
 function initCX(){
   if(!$('#cx')) return;
-  $$('.cx-toggle button').forEach(b=>b.onclick=()=>{ cxMode=b.dataset.m; $$('.cx-toggle button').forEach(x=>x.setAttribute('aria-pressed', x===b)); drawCX(); });
-  $('#cx-mix').onclick=()=>{ cxMix=!cxMix; $('#cx-mix').textContent = cxMix ? '✓ Mixed load: tiles + sanitaryware' : '＋ Mixed load: tiles + sanitaryware'; drawCX(); };
+  const sync=()=>{ $$('.cx-toggle button').forEach(x=>x.setAttribute('aria-pressed', x.dataset.m===cxMode)); $$('#cx-load button').forEach(x=>x.setAttribute('aria-pressed', x.dataset.l===cxLoad)); };
+  $$('.cx-toggle button').forEach(b=>b.onclick=()=>{ cxMode=b.dataset.m; sync(); if(cxLoad==='x') buildMixIn(); drawCX(); });
+  $$('#cx-load button').forEach(b=>b.onclick=()=>{ cxLoad=b.dataset.l; sync(); if(cxLoad==='x'){ buildMixIn(); cxP=1; } drawCX(); });
   $('#cx-range').oninput=e=>{ cxP=e.target.value/100; drawCX(); };
-  cxMix=false; cxMode=$('#cx').dataset.start||'c20'; $$('.cx-toggle button').forEach(x=>x.setAttribute('aria-pressed', x.dataset.m===cxMode)); $('#cx-mix').textContent='＋ Mixed load: tiles + sanitaryware';
-  cxP = 0; drawCX();
+  cxMode=$('#cx').dataset.start||'c20'; cxLoad=$('#cx').dataset.load||'t'; sync();
+  cxP = 0; if(cxLoad==='x') buildMixIn(); drawCX();
+  const free=$('#cx').classList.contains('cx-free');
   if(hasG() && !reduce){
     const upd=s=>{ cxP=s.progress; drawCX(); };
-    if(desk() || mobPin()) ScrollTrigger.create({ trigger:'#cx', start:'top top', end:desk()?'+=900':'+=700', pin:true, scrub:.4, onUpdate:upd, anticipatePin:1 });
+    if(free) ScrollTrigger.create({ trigger:'#cx .cx-svg', start:'top 90%', end:'top 35%', scrub:.4, onUpdate:upd });
+    else if(desk() || mobPin()) ScrollTrigger.create({ trigger:'#cx', start:'top top', end:desk()?'+=900':'+=700', pin:true, scrub:.4, onUpdate:upd, anticipatePin:1 });
     else ScrollTrigger.create({ trigger:'#cx .cx-svg', start:'top 85%', end:'bottom 30%', scrub:.4, onUpdate:upd });
   } else { cxP = 1; drawCX(); }
 }
@@ -241,7 +314,6 @@ ${marquee(['Calacatta','60 × 120','Café noir','Polished','Grey silk','120 × 1
   <a class="tile-card" href="#toilets" style="background:var(--onyx)"><div class="ph"><img src="img/p/sv-l175-room.jpg" alt="Starvoll L175 WC in a bathroom" loading="lazy" style="object-position:50% 62%"></div><div class="tx"><span class="chip" style="background:#fff">Starvoll</span><h3 style="margin-top:12px">Toilets</h3><p style="margin-top:8px">One-piece and close-coupled WCs, led by the L175.</p></div></a>
   <a class="tile-card" href="#insulation" style="background:var(--onyx)"><div class="ph"><img src="img/p/is-spacesaver-2.jpg" alt="Glass wool loft roll being laid in a loft" loading="lazy"></div><div class="tx"><span class="chip" style="background:#fff">Isover</span><h3 style="margin-top:12px">Insulation rolls</h3><p style="margin-top:8px">Spacesaver glass wool rolls, 100 to 200 mm, CE and UKCA marked.</p></div></a>
 </div></div></section>
-${cxBlock()}
 <section class="block b-onyx"><div class="wrap">
   <span class="kicker">Two ways to buy</span><h2 class="split-lines" style="margin-top:16px;max-width:12ch">One factory. Two markets.</h2>
   <div class="split">
@@ -299,33 +371,41 @@ function linePage(l){
 <section class="block b-travertine"><div class="wrap"><span class="kicker">Pairs well with</span><div class="grid3">${rel.map(r=>`<a class="tile-card" href="#line-${r.id}"><div class="ph"><img src="${r.img}" alt="" loading="lazy"></div><div class="tx"><h3>${esc(r.range)} ${esc(r.colour)}</h3><p style="margin-top:6px">${r.finish} · ${r.size}</p></div></a>`).join('')}</div></div></section>${cta('Want this in a container?','b-lagoon')}`;
 }
 
-P.containers = ()=> head('Containers','By the <em>container</em>, worldwide.','For importers, merchants, developers and contractors in any market. RAK porcelain in 20ft or 40ft loads, mixed as you need, shipped to your port.','b-copper', famSwitch('containers'), FAM.word) + `
-<section class="block b-onyx"><div class="wrap grid2"><div><span class="kicker">20ft or 40ft?</span><h2 class="split-lines" style="margin-top:16px">Pick by weight.</h2></div><div>
+P.containers = ()=> head('Containers','By the <em>container</em>, worldwide.','Tiles, toilets and insulation rolls in 20ft or 40ft loads, alone or mixed, shipped to your port. Build your load below and see what fits.','b-copper', '', 'Tiles · Toilets · Insulation') + `
+${cxBlock('c20','x',true,['c20','c40'])}
+<section class="block b-onyx"><div class="wrap grid2"><div><span class="kicker">20ft or 40ft?</span><h2 class="split-lines" style="margin-top:16px">Weight or space?</h2>
+<p class="lead" style="margin-top:18px">Tile runs out of weight before it runs out of space. Toilets and rolls do the opposite. Mixing them fills both.</p></div><div>
  <div class="tscroll"><table class="tbl"><thead><tr><th></th><th>20ft</th><th>40ft</th></tr></thead><tbody>
- <tr><td>Tile we load (incl. pallets)</td><td>≈ 23 t</td><td>≈ 25 t</td></tr>
- <tr><td>60 × 120 cm, 9 mm</td><td>≈ 1,080 m²</td><td>≈ 1,170 m²</td></tr>
- <tr><td>Pallets / boxes</td><td>25 / 750</td><td>27 / 810</td></tr>
- <tr><td>Gross with container (VGM)</td><td>≈ 25.3 t</td><td>≈ 28.9 t</td></tr>
- <tr><td>Container's own rating</td><td>≈ 28 t cargo</td><td>≈ 28.7 t cargo</td></tr>
- <tr><td>Best for</td><td>Tile-only orders</td><td>Mixed loads with lighter goods</td></tr></tbody></table></div>
- <p class="note">We load below the container's rating because the road is the real limit: typically 40 to 44 t gross including the truck, depending on the country. Many lines also add a heavy-load surcharge once a 20ft passes about 20 t gross. Pallet of 60 × 120 ≈ 43.2 m², ≈ 920 kg. Every quote comes with a load plan for your destination.</p></div></div></section>
+ <tr><td>Space inside</td><td>≈ 33 m³</td><td>≈ 67 m³</td></tr>
+ <tr><td>Weight we load to</td><td>≈ 23 t</td><td>≈ 25 t</td></tr>
+ <tr><td>Tiles only</td><td>25 pallets · ≈ 1,080 m²</td><td>27 pallets · ≈ 1,170 m²</td></tr>
+ <tr><td>Toilets only</td><td>≈ 90 boxed WCs</td><td>≈ 185 boxed WCs</td></tr>
+ <tr><td>Insulation only</td><td>≈ 96 rolls · ≈ 1,360 m²</td><td>≈ 193 rolls · ≈ 2,700 m²</td></tr>
+ <tr><td>Filled by</td><td>Weight (tile) or space (toilets, rolls)</td><td>Best for mixed loads</td></tr></tbody></table></div>
+ <p class="note">We load below the container's own rating because the road is the real limit: typically 40 to 44 t gross including the truck, depending on the country. Many lines also add a heavy-load surcharge once a 20ft passes about 20 t gross. Figures are approximate; every quote comes with a load plan for your destination.</p></div></div></section>
 <section class="block b-white"><div class="wrap"><span class="kicker">What you get</span><h2 class="split-lines" style="margin-top:16px">Paperwork done.</h2>
-<div class="steps">${[['Commercial invoice','Values, codes and Incoterm, ready for your customs agent.'],['Packing list','Crate by crate: range, boxes, m² and weight.'],['Bill of lading','Issued by the shipping line for collection at your port.'],['Standards papers','Declaration of Performance to EN 14411 for Europe; ISO 13006 test data or your market\'s standard on request.']].map((s,i)=>`<div class="step"><b>${i+1}</b><h3>${s[0]}</h3><p style="margin-top:6px">${s[1]}</p></div>`).join('')}</div>
+<div class="steps">${[['Commercial invoice','Values, codes and Incoterm for every product line, ready for your customs agent.'],['Packing list','Pallet by pallet: tile boxes and m², WCs and rolls, with weights.'],['Bill of lading','Issued by the shipping line for collection at your port.'],['Standards papers','Tiles: EN 14411 Declaration of Performance or ISO 13006 data. Insulation: Isover\'s EN 13162 declaration. Toilets: maker\'s test data on request.']].map((s,i)=>`<div class="step"><b>${i+1}</b><h3>${s[0]}</h3><p style="margin-top:6px">${s[1]}</p></div>`).join('')}</div>
 <p style="margin-top:28px">We can also supply a certificate of origin. Routes and surcharges out of the Gulf change often, so each quote names the port, routing and charges on the day. <a href="#standards">Standards by country →</a></p></div></section>
-${cxBlock()}${cta('Plan your first container.','b-gold')}`;
+${cta('Plan your first container.','b-gold')}`;
 
-P.pallets = ()=> head('Pallets','By the <em>pallet</em>, worldwide.','From our Jebel Ali warehouse, for jobs that can\'t wait for a full container: urgent top-ups, small projects, or replacement WCs and basins.','b-zellige', famSwitch('pallets'), FAM.word) + `
-<section class="block b-onyx"><div class="wrap grid2"><div><span class="kicker">A typical pallet</span><h2 class="split-lines" style="margin-top:16px">43.2 m², ready to go.</h2></div><div>
-<table class="spec"><tr><td>Format</td><td>60 × 120 cm porcelain, 9 mm</td></tr><tr><td>Boxes per pallet</td><td>30 (2 tiles · 1.44 m² each)</td></tr><tr><td>Coverage</td><td>43.2 m²</td></tr><tr><td>Weight</td><td>≈ 920 kg</td></tr><tr><td>From</td><td>${esc(C.warehouse)}</td></tr><tr><td>In the UAE</td><td>Collect, or delivered across the Emirates</td></tr><tr><td>Worldwide</td><td>Tile pallets by sea in a shared container (LCL); air for samples, sanitaryware and small urgent top-ups</td></tr><tr><td>Prices</td><td class="por">On request: AED in the UAE, USD or EUR for export</td></tr></table>
-<p class="note">Pallet make-up varies by range and size; we confirm it on the quote. A full tonne of tile by air costs more than the tiles are worth, so heavy tile pallets go by sea.</p></div></div></section>
+P.pallets = ()=> head('Pallets','By the <em>pallet</em>, worldwide.','Tiles, toilets and insulation rolls from our Jebel Ali warehouse, for jobs that can\'t wait for a full container: urgent top-ups, small projects, or replacement WCs. Build a pallet below.','b-zellige', '', 'Tiles · Toilets · Insulation') + `
+${cxBlock('pal','x',true,['pal','air'])}
+<section class="block b-onyx"><div class="wrap grid2"><div><span class="kicker">Typical pallets</span><h2 class="split-lines" style="margin-top:16px">Ready to go.</h2></div><div>
+<div class="tscroll"><table class="tbl"><thead><tr><th></th><th>What's on it</th><th>Weight</th></tr></thead><tbody>
+<tr><td>Tiles</td><td>30 boxes of 60 × 120 · 43.2 m²</td><td>≈ 0.9 t</td></tr>
+<tr><td>Toilets</td><td>4 boxed one-piece WCs, e.g. Starvoll L175</td><td>≈ 0.2 t</td></tr>
+<tr><td>Insulation</td><td>6 Spacesaver rolls · ≈ 85 m² at 100 mm</td><td>≈ 0.1 t</td></tr>
+<tr><td>Mixed</td><td>Tile boxes on the base, WCs or rolls on top</td><td>≈ 0.5 t</td></tr></tbody></table></div>
+<table class="spec"><tr><td>From</td><td>${esc(C.warehouse)}</td></tr><tr><td>In the UAE</td><td>Collect, or delivered across the Emirates</td></tr><tr><td>Worldwide</td><td>By sea in a shared container (LCL); air for samples, toilets and small urgent orders</td></tr><tr><td>We plan to</td><td>About ${PAL_MAX.h} cm high and ${PAL_MAX.kg.toLocaleString('en-GB')} kg per pallet</td></tr><tr><td>Prices</td><td class="por">On request: AED in the UAE, USD or EUR for export</td></tr></table>
+<p class="note">Pallet make-up varies by product and size; we confirm it on the quote. A full tonne of tile by air costs more than the tiles are worth, so heavy tile pallets go by sea.</p></div></div></section>
 <section class="block b-white"><div class="wrap"><span class="kicker">When a pallet beats a container</span><h2 class="split-lines" style="margin-top:16px;max-width:14ch">Fast, small, urgent.</h2>
-<div class="grid3">${[['Top-up orders','Short on a range mid-job? Send the code and m² and we\'ll ship a pallet to match.'],['Replacement sanitaryware','Broken WC or basin on site? A mixed pallet of boxed sanitaryware can fly or ship fast.'],['Mix a pallet','Floor, wall and feature tiles plus sanitaryware on one pallet and one delivery.']].map(s=>`<div class="gcard b-onyx" style="min-height:200px"><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('')}</div></div></section>
+<div class="grid3">${[['Top-up orders','Short on a range mid-job? Send the code and m² and we\'ll ship a pallet to match.'],['Replacement toilets','Broken WC on site? Boxed Starvoll WCs can fly or ship fast.'],['Mix a pallet','Tile boxes, a WC and a few rolls of insulation on one pallet and one delivery.']].map(s=>`<div class="gcard b-onyx" style="min-height:200px"><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('')}</div></div></section>
 <section class="block b-noir"><div class="wrap grid2"><div><span class="kicker" style="color:var(--gold)">For distributors</span><h2 class="split-lines" style="margin-top:16px">The sample pallet, by air.</h2>
 <p class="lead" style="margin-top:20px">Everything a new distributor needs to judge the range, on one pallet that flies in the belly of a passenger aircraft: tile boxes from several ranges in the base, a boxed WC and basin on top.</p>
 <p style="margin-top:22px"><a class="pill gold" href="#quote">Request a sample pallet</a></p></div>
 <div><table class="spec" style="color:var(--onyx)"><tr><td>Pallet</td><td>Plastic, 120 × 100 cm (no ISPM 15 fumigation needed)</td></tr><tr><td>Max height</td><td>≈ 160 cm including pallet (lower-deck limit; some aircraft allow ≈ 163 cm)</td></tr><tr><td>Base</td><td>≈ 24 boxes of tile across 6–8 ranges, ≈ 35 m², ≈ 0.7 t</td></tr><tr><td>Top</td><td>1 boxed WC (≈ 45 × 75 × 85 cm) + 1 boxed basin</td></tr><tr><td>Gross weight</td><td>≈ 760 kg, kept under ≈ 1 t for aircraft floor loading</td></tr><tr><td>Transit</td><td>Typically 1–3 days airport to airport from Dubai</td></tr><tr><td>Freight</td><td>Charged on actual weight; quoted on the day</td></tr></table>
 <p class="note" style="color:var(--onyx)">Example build. Final contents, box sizes and weight are confirmed on the quote and with the airline.</p></div></div></section>
-${cxBlock('pal')}${cta('Need a pallet this week?','b-gold')}`;
+${cta('Need a pallet this week?','b-gold')}`;
 
 P['how-it-works'] = ()=> head('How it works','Six steps, <em>no surprises</em>.','How an order moves from your enquiry to tiles on site.','b-gold') + `
 <section class="block b-onyx"><div class="wrap article">${[['1. Enquiry','Send ranges, colours, quantities and your delivery point. Not sure yet? Tell us the job and we will suggest lines.'],['2. Samples','We arrange samples so you can check colour, veining and finish.'],['3. Written quote','Per order, in USD or EUR for containers, or AED in the UAE: ex-works, CIF to your port, or delivered. It names the routing and surcharges on the day.'],['4. Confirm and pay','You confirm in writing. Payment terms are agreed per order.'],['5. Load and ship','Containers: we book, plan the load by weight and send the documents. Pallets: prepared at Jebel Ali, then delivered in the UAE or shipped by shared container or air.'],['6. Arrival','Containers: your customs agent clears the goods at the destination port under your country\'s duty and tax rules. Pallets in the UAE: collect or take delivery.']].map(s=>`<h3>${s[0]}</h3><p>${s[1]}</p>`).join('')}</div></section>${cta()}`;
@@ -398,7 +478,7 @@ P.insulation = ()=>{ const I=D.isover; return head('Insulation','Glass wool, <em
   <p class="note">Figures from Isover's Spacesaver datasheet. Stock thicknesses and pallet make-up are confirmed on the quote.</p></div></section>
 <section class="block b-noir"><div class="wrap grid2"><div><span class="kicker" style="color:var(--gold)">Why it pairs with tile</span><h2 class="split-lines" style="margin-top:16px">Light goods, spare space.</h2><div class="pgal" style="margin-top:28px"><img src="img/p/is-spacesaver-2.jpg" alt="Glass wool loft roll being laid between ceiling joists" loading="lazy"></div></div>
   <div><p class="lead">A tile container hits its weight limit long before it is full. Glass wool is the opposite: light, compressed and bulky. Load the tile to the weight limit and fill the space above with rolls, so the same freight carries more value.</p>
-  <p style="margin-top:22px"><a class="pill gold" href="#quote">Ask for a mixed-load plan</a></p></div></div></section>
+  <p style="margin-top:22px"><a class="pill gold" href="#containers">Build a mixed container →</a></p></div></div></section>
 ${cta('Insulation for your next job?','b-gold')}`; };
 
 P.textiles = ()=> head('Textiles','Textiles, <em>coming soon</em>.','Our second line is on its way. We are adding ranges now.','b-copper') + `<section class="block b-onyx"><div class="wrap grid2"><div><span class="kicker">What's next</span><h2 class="split-lines" style="margin-top:16px">Watch this space.</h2></div><div class="article"><p class="lead">Tell us what you're looking for and we'll let you know when the first ranges are live.</p><div class="ctas" style="margin-top:24px"><a class="pill" href="#quote">Register interest</a><a class="pill ghost" href="#tiles">Back to tiles</a></div></div></div></section>`;
