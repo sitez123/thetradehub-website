@@ -16,8 +16,57 @@ window.TH = {
   // so a new line (e.g. textiles) reuses the same pages: add its word, blocks and mixed-load items here.
   families: [
     { id: "tiles", word: "Tiles", ready: true, unit: "m² of 60 × 120", blockImgs: ["t-calacatta","t-cafe","t-onyx","t-glaze","t-ivory","t-terrazzo","t-oak","t-stone"], mixWord: "sanitaryware" },
+    { id: "toilets", word: "Toilets", ready: true, link: true },
+    { id: "insulation", word: "Insulation", ready: true, link: true },
     { id: "textiles", word: "Textiles", ready: false }
   ],
+
+  // Starvoll WCs, as stocked by UAE sanitaryware suppliers. "—" = not published; confirmed on quotation.
+  starvoll: {
+    lead: {
+      model: "L175", type: "One-piece floor-standing WC",
+      rows: [
+        ["Model", "L175W (S-trap) · L175P (P-trap)"],
+        ["Type", "One-piece, floor-standing"],
+        ["Size (L × W × H)", "720 × 360 × 810 mm"],
+        ["Weight", "≈ 35 kg"],
+        ["Material", "Ceramic"],
+        ["Colours", "White · Ivory · Matt black (L-175B) · Gold electroplated (L175G)"],
+        ["Gold version", "L175G: siphonic one-piece, 730 × 350 × 800 mm"]
+      ],
+      variants: [["L175W","White","#F4F2EE"],["L175P","White, P-trap","#F4F2EE"],["L175","Ivory","#EEE4CF"],["L-175B","Matt black","#2B2826"],["L175G","Gold","#C9A45A"]]
+    },
+    range: [
+      ["L175", "One-piece", "S-trap or P-trap", "720 × 360 × 810", "White, ivory, matt black, gold"],
+      ["L136", "One-piece", "S-trap", "—", "Glossy white"],
+      ["L138", "One-piece, washdown", "S-trap, 250 mm", "680 × 365 × 785", "White"],
+      ["L139", "Floor-standing", "S-trap, 250 mm", "670 × 365 × 770", "Alpine white"],
+      ["L803", "One-piece, elongated", "S-trap", "—", "Glossy white"],
+      ["2051A", "Close-coupled, rimless", "S-trap, 250 mm", "690 × 355 × 835", "White"],
+      ["F805", "Wall-hung, concealed cistern", "—", "505 × 360 × 360", "Matt black"]
+    ]
+  },
+
+  // Isover Spacesaver glass mineral wool roll (Isover datasheet, published 2 March 2026)
+  isover: {
+    product: "Isover Spacesaver",
+    facts: [
+      ["Product", "Isover Spacesaver glass mineral wool roll"],
+      ["Use", "Thermal insulation between ceiling joists in pitched roofs (loft floors)"],
+      ["Thermal conductivity", "λD 0.044 W/m·K"],
+      ["Reaction to fire", "Euroclass A1, non-combustible (EN 13501-1)"],
+      ["Standard", "EN 13162 · designation MW-EN 13162-T1"],
+      ["Marking", "CE and UKCA marked to EN 13162"],
+      ["Fitting", "Pre-perforated to fit common joist spacings"],
+      ["Recycled content", "52% recycled glass plus 30% glass cullet"]
+    ],
+    sizes: [
+      ["100 mm", "2.25", "12.18 × 1.16 m", "14.13", "24", "339.09", "5200854520"],
+      ["150 mm", "3.40", "8.05 × 1.16 m", "9.34", "24", "224.11", "5200854529"],
+      ["170 mm", "3.85", "7.03 × 1.16 m", "8.15", "24", "195.72", "5200854549"],
+      ["200 mm", "4.50", "5.20 × 1.16 m", "6.03", "24", "144.77", "5200840154"]
+    ]
+  },
 
   // 20ft / 40ft / pallet figures used by the container explainer and calculator (approximate)
   load: {

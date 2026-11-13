@@ -48,9 +48,9 @@ const cta = (title='Tell us what you need.', cls='b-gold') => `<section class="b
 
 function footer(){
   return `<footer class="footer"><div class="wrap"><div class="fcols">
-    <div><a class="logo" href="#home" style="color:var(--onyx)"><i></i>The Trade Hub</a><p style="margin-top:14px;opacity:.8;max-width:34ch">Ceramic and porcelain tiles from Ras Al Khaimah. Containers worldwide, pallets across the UAE.</p>
+    <div><a class="logo" href="#home" style="color:var(--onyx)"><i></i>The Trade Hub</a><p style="margin-top:14px;opacity:.8;max-width:34ch">Tiles, toilets and insulation from the UAE. Containers worldwide, pallets across the UAE.</p>
       <p style="margin-top:14px" class="mono">${esc(C.phone)} · ${esc(C.email)}</p></div>
-    <div><h4>Tiles</h4>${D.collections.map(c=>`<a href="#${c.id}">${c.name}</a>`).join('')}</div>
+    <div><h4>Products</h4><a href="#tiles">Tiles</a>${D.collections.map(c=>`<a href="#${c.id}">· ${c.name}</a>`).join('')}<a href="#toilets">Toilets</a><a href="#insulation">Insulation</a></div>
     <div><h4>Buying</h4><a href="#containers">Containers</a><a href="#pallets">Pallets</a><a href="#how-it-works">How it works</a><a href="#calculator">Calculator</a><a href="#quote">Get a quote</a><a href="#textiles">Textiles</a></div>
     <div><h4>Know-how</h4><a href="#guides">Guides</a><a href="#standards">Standards</a><a href="#glossary">Glossary</a><a href="#faq">FAQ</a><a href="#about">About</a></div>
   </div>
@@ -195,8 +195,20 @@ function initCX(){
 }
 
 function famSwitch(page){
-  return `<div class="famsw" role="group" aria-label="Product">${D.families.map(f=> f.ready ? `<span class="on">${f.word}</span>` : `<span class="off" title="Coming soon">${f.word} · soon</span>`).join('')}</div>`;
+  const act = ['toilets','insulation'].includes(page) ? page : 'tiles';
+  return `<div class="famsw" role="group" aria-label="Product">${D.families.map(f=> !f.ready ? `<span class="off" title="Coming soon">${f.word} · soon</span>` : f.id===act ? `<span class="on">${f.word}</span>` : `<a class="lk" href="#${f.id}">${f.word} →</a>`).join('')}</div>`;
 }
+
+const ILL_WC = `<svg class="illo-svg" viewBox="0 0 240 240" aria-hidden="true"><ellipse cx="128" cy="214" rx="86" ry="9" fill="rgba(42,32,28,.14)"/>
+<rect x="134" y="36" width="62" height="100" rx="16" fill="#fff" stroke="#2A201C" stroke-width="3"/><rect x="156" y="30" width="20" height="8" rx="4" fill="#D3A257"/>
+<path d="M36 120H192V140C192 160 176 171 160 173L151 210H100L106 179C68 176 38 160 36 120Z" fill="#fff" stroke="#2A201C" stroke-width="3" stroke-linejoin="round"/>
+<rect x="30" y="110" width="160" height="12" rx="6" fill="#F6F2EA" stroke="#2A201C" stroke-width="3"/><path d="M62 140C80 152 112 156 140 150" fill="none" stroke="#2A201C" stroke-width="2" opacity=".35"/></svg>`;
+const ILL_ROLL = `<svg class="illo-svg" viewBox="0 0 260 220" aria-hidden="true"><ellipse cx="140" cy="196" rx="104" ry="9" fill="rgba(42,32,28,.16)"/>
+<path d="M70 52H214A30 70 0 0 1 214 192H70Z" fill="#F2CE52" stroke="#2A201C" stroke-width="3" stroke-linejoin="round"/>
+<path d="M78 98H222M78 146H222" stroke="#2A201C" stroke-width="2" stroke-dasharray="7 7" opacity=".45"/>
+<ellipse cx="70" cy="122" rx="32" ry="70" fill="#E3B63C" stroke="#2A201C" stroke-width="3"/>
+<path d="M70 122m0 0c6 0 8 8 4 14s-14 6-18-2 0-22 12-26 26 6 28 22-6 36-22 42-36-6-40-28 4-50 24-60" fill="none" stroke="#B88A1E" stroke-width="3" stroke-linecap="round"/></svg>`;
+function illo(svg, bg){ return `<div class="illo" style="background:${bg}">${svg}</div>`; }
 /* ---------- pages ---------- */
 const P = {};
 const HV = (()=>{ try{ const q=new URLSearchParams(location.search).get('hero'); return ['a','b','c'].includes(q)?q:'b'; }catch(e){ return 'b'; } })();
@@ -205,7 +217,7 @@ const SEAL = `<svg class="seal" viewBox="0 0 120 120" aria-hidden="true"><defs><
 const HERO_COPY = (cls='')=>`<div class="hero-copy ${cls}">
   <span class="kicker">Ras Al Khaimah · Jebel Ali · Worldwide</span>
   <h1 class="hero-h" style="margin-top:18px"><span class="ln"><span>Marble looks,</span></span><span class="ln"><span><em>straight</em> from</span></span><span class="ln"><span>the kiln.</span></span></h1>
-  <p class="lead">RAK porcelain and ceramic tiles, shipped by the 20ft or 40ft container to buyers worldwide, and by the pallet from our Jebel Ali warehouse, across the UAE or worldwide for fast orders.</p>
+  <p class="lead">RAK porcelain tiles, Starvoll toilets and Isover glass wool rolls, shipped by the 20ft or 40ft container to buyers worldwide, and by the pallet from our Jebel Ali warehouse, across the UAE or worldwide for fast orders.</p>
   <div class="ctas"><a class="pill copper" href="#containers">Containers worldwide</a><a class="pill" href="#pallets">Pallets worldwide</a><a class="pill ghost" href="#tiles">See the tiles</a></div>
   ${CREDS}
 </div>`;
@@ -233,6 +245,12 @@ function heroC(){ return `<section class="hero hero-c"><div class="wrap">${HERO_
 P.home = ()=>`
 ${HV==='b'?heroB():HV==='c'?heroC():heroA()}
 ${marquee(['Calacatta','60 × 120','Café noir','Polished','Grey silk','120 × 120','Lappato','Travertine','20ft · 40ft','Zellige glaze','Honed','Jebel Ali pallets'])}
+<section class="block b-white"><div class="wrap"><span class="kicker">What we supply</span><h2 class="split-lines" style="margin-top:16px">Tiles, toilets, insulation.</h2>
+<div class="grid3 lines3">
+  <a class="tile-card" href="#tiles" style="background:var(--onyx)"><div class="ph"><img src="img/tiles-marble.jpg" alt="Marble-look porcelain bathroom" loading="lazy"></div><div class="tx"><span class="chip" style="background:#fff">RAK porcelain &amp; ceramic</span><h3 style="margin-top:12px">Tiles</h3><p style="margin-top:8px">Marble, stone, concrete and wood looks, by the container or the pallet.</p></div></a>
+  <a class="tile-card" href="#toilets" style="background:var(--onyx)"><div class="ph">${illo(ILL_WC,'var(--silk)')}</div><div class="tx"><span class="chip" style="background:#fff">Starvoll</span><h3 style="margin-top:12px">Toilets</h3><p style="margin-top:8px">One-piece and close-coupled WCs, led by the L175.</p></div></a>
+  <a class="tile-card" href="#insulation" style="background:var(--onyx)"><div class="ph">${illo(ILL_ROLL,'var(--travertine)')}</div><div class="tx"><span class="chip" style="background:#fff">Isover</span><h3 style="margin-top:12px">Insulation rolls</h3><p style="margin-top:8px">Spacesaver glass wool rolls, 100 to 200 mm, CE and UKCA marked.</p></div></a>
+</div></div></section>
 ${cxBlock()}
 <section class="block b-onyx"><div class="wrap">
   <span class="kicker">Two ways to buy</span><h2 class="split-lines" style="margin-top:16px;max-width:12ch">One factory. Two markets.</h2>
@@ -300,7 +318,7 @@ P.containers = ()=> head('Containers','By the <em>container</em>, worldwide.','F
  <tr><td>Gross with container (VGM)</td><td>≈ 25.3 t</td><td>≈ 28.9 t</td></tr>
  <tr><td>Container's own rating</td><td>≈ 28 t cargo</td><td>≈ 28.7 t cargo</td></tr>
  <tr><td>Best for</td><td>Tile-only orders</td><td>Mixed loads with lighter goods</td></tr></tbody></table></div>
- <p class="note">We load below the container's rating because the lorry is the real limit: 44 t gross in the UK and 40 t in much of Europe, including the truck. Many lines also add a heavy-load surcharge once a 20ft passes about 20 t gross. Pallet of 60 × 120 ≈ 43.2 m², ≈ 920 kg. Every quote comes with a load plan for your destination.</p></div></div></section>
+ <p class="note">We load below the container's rating because the road is the real limit: typically 40 to 44 t gross including the truck, depending on the country. Many lines also add a heavy-load surcharge once a 20ft passes about 20 t gross. Pallet of 60 × 120 ≈ 43.2 m², ≈ 920 kg. Every quote comes with a load plan for your destination.</p></div></div></section>
 <section class="block b-white"><div class="wrap"><span class="kicker">What you get</span><h2 class="split-lines" style="margin-top:16px">Paperwork done.</h2>
 <div class="steps">${[['Commercial invoice','Values, codes and Incoterm, ready for your customs agent.'],['Packing list','Crate by crate: range, boxes, m² and weight.'],['Bill of lading','Issued by the shipping line for collection at your port.'],['Standards papers','Declaration of Performance to EN 14411 for Europe; ISO 13006 test data or your market\'s standard on request.']].map((s,i)=>`<div class="step"><b>${i+1}</b><h3>${s[0]}</h3><p style="margin-top:6px">${s[1]}</p></div>`).join('')}</div>
 <p style="margin-top:28px">We can also supply a certificate of origin. Routes and surcharges out of the Gulf change often, so each quote names the port, routing and charges on the day. <a href="#standards">Standards by country →</a></p></div></section>
@@ -365,6 +383,34 @@ P.about = ()=> head('About','A trading desk <em>beside</em> the factory.','','b-
 <p style="margin-top:18px">We buy RAK porcelain and ceramic tiles and sell them on two ways: full containers to buyers worldwide, and pallets from our Jebel Ali warehouse for builders and fit-out firms working in the UAE.</p>
 <p>We are not RAK Ceramics, and we are not one of RAK's appointed distributors. We are a trade buyer that plans loads, handles export paperwork and quotes in writing.</p>
 <p class="note">Trade licence: ${esc(C.licence)}</p></div></div></section>${cta()}`;
+
+P.toilets = ()=>{ const S=D.starvoll, L=S.lead; return head('Toilets','Starvoll WCs, <em>stocked</em> in Dubai.','One-piece and close-coupled WCs from the Starvoll range, held by UAE suppliers. By the pallet for fast orders and replacements, mixed into a tile container, or on a distributor sample pallet.','b-silk', famSwitch('toilets'), 'Toilets') + `
+<section class="block b-onyx"><div class="wrap grid2"><div>${illo(ILL_WC,'var(--silk)')}
+  <div class="vsw">${L.variants.map(v=>`<span><i style="background:${v[2]}"></i>${v[0]} · ${v[1]}</span>`).join('')}</div></div>
+  <div><span class="kicker">Our lead model</span><h2 class="split-lines" style="margin-top:16px">Starvoll <em>L175</em>.</h2>
+  <p class="lead" style="margin-top:16px">A one-piece WC, cistern and bowl in a single piece of ceramic, in white, ivory, matt black or gold.</p>
+  <table class="spec">${L.rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}<tr><td>The Trade Hub price</td><td>On request</td></tr></table>
+  <div class="ctas" style="margin-top:26px"><a class="pill copper" href="#quote">Quote the L175</a><a class="pill ghost" href="#pallets">By the pallet</a></div></div></div></section>
+<section class="block b-white"><div class="wrap"><span class="kicker">The range</span><h2 class="split-lines" style="margin-top:16px">Pick a WC.</h2>
+  <div class="tscroll"><table class="tbl stack"><thead><tr><th>Model</th><th>Type</th><th>Trap / roughing-in</th><th>Size L × W × H (mm)</th><th>Colours</th></tr></thead><tbody>${S.range.map(r=>`<tr${r[0]==='L175'?' class="hi"':''}><td data-label="Model" class="mono"><b>${r[0]}</b></td><td data-label="Type">${r[1]}</td><td data-label="Trap">${r[2]}</td><td data-label="Size" style="white-space:nowrap">${r[3]}</td><td data-label="Colours">${r[4]}</td></tr>`).join('')}</tbody></table></div>
+  <p class="note">"—" means not published by the suppliers we checked. We confirm the current spec sheet, seat and fittings with every quote.</p></div></section>
+<section class="block b-travertine"><div class="wrap"><span class="kicker">How they ship</span><h2 class="split-lines" style="margin-top:16px;max-width:14ch">Three ways to buy.</h2>
+<div class="grid3">${[['By the pallet','Boxed WCs from Jebel Ali, across the UAE or shipped worldwide. Ideal for replacing broken units on site.','#pallets'],['In a tile container','Heavy tile on the floor, boxed WCs on top: one load, one set of papers.','#containers'],['On a sample pallet','A boxed L175 rides on top of the tile boxes on our distributor sample pallet by air.','#pallets']].map(s=>`<a class="gcard b-onyx" href="${s[2]}" style="min-height:220px"><h3>${s[0]}</h3><p>${s[1]}</p><span class="pill" style="align-self:flex-start;margin-top:18px">More →</span></a>`).join('')}</div></div></section>
+${cta('Need WCs this week?','b-gold')}`; };
+
+P.insulation = ()=>{ const I=D.isover; return head('Insulation','Glass wool, <em>by the roll</em>.','Isover Spacesaver glass mineral wool rolls for lofts and ceiling joists. CE and UKCA marked to EN 13162, Euroclass A1 non-combustible.','b-gold', famSwitch('insulation'), 'Insulation') + `
+<section class="block b-onyx"><div class="wrap grid2"><div>${illo(ILL_ROLL,'var(--travertine)')}</div>
+  <div><span class="kicker">The product</span><h2 class="split-lines" style="margin-top:16px">Isover <em>Spacesaver</em>.</h2>
+  <table class="spec">${I.facts.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}<tr><td>The Trade Hub price</td><td>On request</td></tr></table>
+  <div class="ctas" style="margin-top:26px"><a class="pill copper" href="#quote">Quote Spacesaver</a><a class="pill ghost" href="#containers">Mix with tiles</a></div></div></div></section>
+<section class="block b-white"><div class="wrap"><span class="kicker">Thicknesses</span><h2 class="split-lines" style="margin-top:16px">100 to 200 mm.</h2>
+  <div class="tscroll"><table class="tbl stack"><thead><tr><th>Thickness</th><th>R-value (m²K/W)</th><th>Roll (L × W)</th><th>m² per roll</th><th>Rolls per pallet</th><th>m² per pallet</th><th>Isover code</th></tr></thead><tbody>${I.sizes.map(r=>`<tr><td data-label="Thickness"><b>${r[0]}</b></td><td data-label="R-value">${r[1]}</td><td data-label="Roll" style="white-space:nowrap">${r[2]}</td><td data-label="m² per roll">${r[3]}</td><td data-label="Rolls per pallet">${r[4]}</td><td data-label="m² per pallet">${r[5]}</td><td data-label="Isover code" class="mono">${r[6]}</td></tr>`).join('')}</tbody></table></div>
+  <p class="note">Figures from Isover's Spacesaver datasheet. Stock thicknesses and pallet make-up are confirmed on the quote.</p></div></section>
+<section class="block b-noir"><div class="wrap grid2"><div><span class="kicker" style="color:var(--gold)">Why it pairs with tile</span><h2 class="split-lines" style="margin-top:16px">Light goods, spare space.</h2></div>
+  <div><p class="lead">A tile container hits its weight limit long before it is full. Glass wool is the opposite: light, compressed and bulky. Load the tile to the weight limit and fill the space above with rolls, so the same freight carries more value.</p>
+  <p style="margin-top:22px"><a class="pill gold" href="#quote">Ask for a mixed-load plan</a></p></div></div></section>
+${cta('Insulation for your next job?','b-gold')}`; };
+
 P.textiles = ()=> head('Textiles','Textiles, <em>coming soon</em>.','Our second line is on its way. We are adding ranges now.','b-copper') + `<section class="block b-onyx"><div class="wrap grid2"><div><span class="kicker">What's next</span><h2 class="split-lines" style="margin-top:16px">Watch this space.</h2></div><div class="article"><p class="lead">Tell us what you're looking for and we'll let you know when the first ranges are live.</p><div class="ctas" style="margin-top:24px"><a class="pill" href="#quote">Register interest</a><a class="pill ghost" href="#tiles">Back to tiles</a></div></div></div></section>`;
 P.quote = ()=> head('Get a quote','Let\'s <em>price</em> it.','Quotes are written per order. Tell us as much as you know; we\'ll fill in the rest.','b-lagoon') + `
 <section class="block b-onyx"><div class="wrap grid2"><form id="qf"><div class="f">

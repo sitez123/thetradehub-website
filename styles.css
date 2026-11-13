@@ -60,7 +60,7 @@ body.noscroll{overflow:hidden}
 .float.mo{display:none}
 .swipe-hint{display:none}
 .fcols a.logo{display:flex}
-@media (max-width:1060px){.nav a.l{display:none}.burger{display:block}.nav .pill.cta{display:none}}
+@media (max-width:1240px){.nav a.l{display:none}.burger{display:block}.nav .pill.cta{display:none}}
 
 /* blocks */
 .block{position:relative;border-radius:var(--r-xl) var(--r-xl) 0 0;margin-top:calc(-1*var(--r-xl));padding:clamp(80px,11vw,160px) 0 clamp(90px,12vw,170px)}
@@ -368,7 +368,7 @@ form .full{grid-column:1/-1}
 .nav{transition:transform .45s cubic-bezier(.2,.8,.2,1),top .35s ease}
 body.at-top .nav{top:52px}
 @media (max-width:1100px){.topbar .tb-mid{display:none}}
-@media (max-width:760px){.topbar .wrap{justify-content:center;height:34px}.topbar a{display:none}.topbar{font-size:.64rem}body.at-top .nav{top:46px}}
+@media (max-width:760px){.topbar .wrap{justify-content:center;height:34px}.topbar a{display:none}.topbar .tb-loc{display:none}.topbar{font-size:.64rem}body.at-top .nav{top:46px}}
 
 /* ---------- hero shared ---------- */
 .hero{padding-top:170px}
@@ -451,3 +451,16 @@ body.at-top .nav{top:52px}
   .fan figure{flex-basis:46%;margin:0 -7vw}
   .fan figure.mid{flex-basis:54%}
 }
+
+/* product illustrations + new lines */
+.illo{border-radius:var(--r-l);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tile-card .ph .illo{border-radius:0;aspect-ratio:auto;height:100%}
+.illo-svg{width:62%;height:auto;filter:drop-shadow(0 20px 30px rgba(42,32,28,.18))}
+.tile-card .illo-svg{width:46%}
+.vsw{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.vsw span{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.74rem;padding:7px 12px;border-radius:var(--r-pill);background:#fff}
+.vsw i{width:14px;height:14px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(42,32,28,.3)}
+.tbl tr.hi td{background:rgba(211,162,87,.16)}
+.famsw a.lk{font-family:var(--mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;padding:8px 14px;border-radius:var(--r-pill);text-decoration:none;box-shadow:inset 0 0 0 1.5px currentColor}
+.famsw a.lk:hover{background:var(--onyx);color:var(--noir);box-shadow:none}
+.nav{gap:2px}
