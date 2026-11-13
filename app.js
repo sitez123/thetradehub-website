@@ -29,8 +29,9 @@ const FLM = [ // mobile-only cluster under the hero text: [img, left%, bottom vw
   ['sp:#D3A257',  38, 42, 9, 1.2, 20],
   ['sp:#C2623A',  8, 4, 7, .8, -15]
 ];
-function floatsMobile(){
-  return FLM.map(([k,l,t,w,d,r])=>{
+function floatsMobile(){ return floatsMobileSet(FLM); }
+function floatsMobileSet(set){
+  return set.map(([k,l,t,w,d,r])=>{
     const inner = k.startsWith('sp:') ? spacer(k.slice(3)) : `<img class="ftile" src="img/${k}.jpg" alt="" loading="eager">`;
     return `<div class="float mo" data-depth="${d}" style="left:${l}%;bottom:${t}vw;width:${w}vw;transform:rotate(${r}deg)" data-rot="${r}">${inner}</div>`;
   }).join('');
@@ -198,13 +199,39 @@ function famSwitch(page){
 }
 /* ---------- pages ---------- */
 const P = {};
-P.home = ()=>`
-<section class="hero"><div class="wrap">
+const HV = (()=>{ try{ const q=new URLSearchParams(location.search).get('hero'); return ['a','b','c'].includes(q)?q:'b'; }catch(e){ return 'b'; } })();
+const CREDS = `<ul class="creds"><li>Factory-direct from RAK Ceramics</li><li>ISO 13006 · EN 14411</li><li>20ft · 40ft · pallets · air samples</li></ul>`;
+const SEAL = `<svg class="seal" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="sealp" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1-88 0"/></defs><circle cx="60" cy="60" r="58" fill="var(--noir)"/><text><textPath href="#sealp" textLength="272" lengthAdjust="spacing">RAK CERAMICS · FACTORY DIRECT · WORLDWIDE ·</textPath></text><g transform="translate(60 60) rotate(12)"><rect x="-13" y="-13" width="13" height="13" fill="#D3A257"/><rect x="0" y="-13" width="13" height="13" fill="#0E8E8A"/><rect x="-13" y="0" width="13" height="13" fill="#E6D2B0"/><rect x="0" y="0" width="13" height="13" fill="#F6F2EA"/></g></svg>`;
+const HERO_COPY = (cls='')=>`<div class="hero-copy ${cls}">
   <span class="kicker">Ras Al Khaimah · Jebel Ali · Worldwide</span>
   <h1 class="hero-h" style="margin-top:18px"><span class="ln"><span>Marble looks,</span></span><span class="ln"><span><em>straight</em> from</span></span><span class="ln"><span>the kiln.</span></span></h1>
   <p class="lead">RAK porcelain and ceramic tiles, shipped by the 20ft or 40ft container to buyers worldwide, and by the pallet from our Jebel Ali warehouse, across the UAE or worldwide for fast orders.</p>
   <div class="ctas"><a class="pill copper" href="#containers">Containers worldwide</a><a class="pill" href="#pallets">Pallets worldwide</a><a class="pill ghost" href="#tiles">See the tiles</a></div>
-</div>${floats(FL)}${floatsMobile()}</section>
+  ${CREDS}
+</div>`;
+const FLA = [
+  ['t-cafe',      49, 15, 170, .9, -9, 0],
+  ['t-calacatta', 89, 68, 160, .6, 8, 1],
+  ['t-onyx',      -5, 88, 210, .7, 11, 1],
+  ['sp:#D3A257',  93, 14, 40, 1.2, 20, 1],
+  ['sp:#C2623A',  44, 52, 30, .6, 35, 1]
+];
+const FLAM = [
+  ['t-cafe',      -6, 2, 40, .9, -8],
+  ['t-glaze',     66, 6, 38, 1.1, -5],
+  ['sp:#D3A257',  40, 2, 8, 1.2, 20]
+];
+function heroA(){ return `<section class="hero hero-a"><div class="wrap hero-grid">${HERO_COPY()}
+  <figure class="hero-pic"><div class="arch"><img src="img/mega-slabs-stone.jpg" alt="Kitchen with stone-look porcelain slab island and floor, RAK Ceramics" loading="eager"></div>
+    <figcaption class="tag"><span class="kicker">In this room</span><b>Stone-look slabs &amp; floor</b><small>Photo: RAK Ceramics</small></figcaption>${SEAL}</figure>
+</div>${floats(FLA)}${floatsMobileSet(FLAM)}</section>`; }
+function heroB(){ return `<section class="hero hero-b"><img class="hb-img" src="img/mega-slabs-stone.jpg" alt="Kitchen with stone-look porcelain slab island and floor, RAK Ceramics" loading="eager"><div class="hb-shade"></div>
+  <div class="wrap">${HERO_COPY('on-dark')}</div><small class="hb-cred">Photo: RAK Ceramics</small>${SEAL}</section>`; }
+function heroC(){ return `<section class="hero hero-c"><div class="wrap">${HERO_COPY('center')}</div>
+  <div class="fan"><figure style="--r:-7deg;--y:40px"><img src="img/tiles-marble.jpg" alt="Marble-look porcelain bathroom, RAK Ceramics"></figure><figure class="mid" style="--r:0deg;--y:0px"><img src="img/mega-slabs-stone.jpg" alt="Stone-look slab kitchen, RAK Ceramics"></figure><figure style="--r:7deg;--y:40px"><img src="img/bricks.jpg" alt="Glazed green wall tiles behind a bath, RAK Ceramics"></figure></div>
+  <small class="hb-cred dark">Photos: RAK Ceramics</small>${floats(FL.filter(f=>f[0].startsWith('sp:')))}</section>`; }
+P.home = ()=>`
+${HV==='b'?heroB():HV==='c'?heroC():heroA()}
 ${marquee(['Calacatta','60 × 120','Café noir','Polished','Grey silk','120 × 120','Lappato','Travertine','20ft · 40ft','Zellige glaze','Honed','Jebel Ali pallets'])}
 ${cxBlock()}
 <section class="block b-onyx"><div class="wrap">
@@ -395,6 +422,9 @@ function motion(){
   gsap.registerPlugin(ScrollTrigger);
   // hero lines
   const hl=$$('.hero-h .ln>span'); if(hl.length) gsap.from(hl,{yPercent:110,duration:1.1,ease:'expo.out',stagger:.12,delay:.1});
+  const ar=$('.hero .arch img, .hero .hb-img'); if(ar){ gsap.from(ar,{scale:1.15,duration:1.8,ease:'expo.out'}); gsap.to(ar,{yPercent:8,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}}); }
+  const fan=$$('.fan figure'); if(fan.length) gsap.from(fan,{y:160,opacity:0,duration:1.3,ease:'expo.out',stagger:.1,delay:.3});
+  $$('.creds li').forEach((li,i)=>gsap.from(li,{opacity:0,y:12,duration:.8,delay:.7+i*.08}));
   // floats: idle bob + scroll parallax + pointer
   $$('.float').forEach((el,i)=>{
     const d=+el.dataset.depth||.5, r=+el.dataset.rot||0;
@@ -425,7 +455,7 @@ function pointer(){
 
 /* ---------- boot ---------- */
 function boot(){
-  let last=0; addEventListener('scroll',()=>{ const y=scrollY; $('.nav').classList.toggle('hide', y>last && y>220); $('.mbar').classList.toggle('show', y>innerHeight*.55 || !$('.hero')); last=y; },{passive:true});
+  let last=0; addEventListener('scroll',()=>{ const y=scrollY; $('.nav').classList.toggle('hide', y>last && y>220); document.body.classList.toggle('at-top', y<30); $('.mbar').classList.toggle('show', y>innerHeight*.55 || !$('.hero')); last=y; },{passive:true});
   $('.burger').onclick=()=>{ $('.sheet').classList.add('open'); document.body.classList.add('noscroll'); if(lenis) lenis.stop();
     if(hasG()&&!reduce) gsap.from('.sheet .sl a',{y:40,opacity:0,duration:.6,stagger:.04,ease:'expo.out'}); };
   const closeSheet=()=>{ $('.sheet').classList.remove('open'); document.body.classList.remove('noscroll'); if(lenis) lenis.start(); };
